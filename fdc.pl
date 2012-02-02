@@ -48,7 +48,7 @@ cKeys(R, F, Keys) :-
   cSuperKeys(R, F, SuperKeys),
   findall(X, (member(X, SuperKeys), cMinimal(X, SuperKeys)), Keys).
 
-% cPrimary attributumok: elemei valamelyik kulcsnak
+% primary attributes: member of some key
 cPrimary(R, F, A) :-
   cKeys(R, F, Keys),
   union(Keys, PrimaryAttributes),
