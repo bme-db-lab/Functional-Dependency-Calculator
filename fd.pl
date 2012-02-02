@@ -1,179 +1,46 @@
-:- module(fd, [cSingleRightSide/2, cNF/3, cFmin/2, cFequiv/2]).
+:- module(fdp, [nf/3, fmin/2, fequiv/2]).
 :- use_module(functional).
-:- use_module(sets).
-:- dynamic(leftred/1).  
-:- dynamic(minimal/1).  
+:- use_module(fd).
+:- use_module(library(lists)).
 
-% operator for readable FDs
-:- op(800, xfx, ->).
+% convert atom to list of one-character atoms and backwards
+% myatom <---> [m, y, a, t, o, m]
+%    [a] ----> a
+%     a  <---- a
+atom_to_list(A, L) :- 
+  ( atom(L) -> A = L
+  ; atom_chars(A, L)
+  ).
+
+% from pretty to canonical
+prettyFDs(FC, FP) :-
+  map(FC, fdp:prettyFD, FP).
+
+prettyFD(XL->YL, XA->YA) :-
+  atom_to_list(XA, XL),
+  atom_to_list(YA, YL).
   
-% XClosed = X+(F)
-cClose(X, F, XClosed) :-
-  ( X = [] -> XClosed = []
-  ; foldr(F, fd:cExpand, X, X0),
-    ( X = X0 -> XClosed = X0
-    ; cClose(X0, F, XClosed)
-    )
-  ).
+% from canonical to pretty
+canonicalFDs(FC, FP) :-
+  map(FC, fdp:canonicalFD, FP).
 
-% FD, set of attributes, expanded set of attributes
-cExpand(Y->B, X, XExpanded) :-
-  ( subset(Y, X) -> union(X, [B], XExpanded) % Y is a subset of X
-  ; XExpanded = X % cannot expand
-  ).
-
-% X is a superkey if X+(F) = R
-% two sets are equivalent if both are a subset of the other.
-% the X+(F) is always a subset of R, so we need to check if R is a subset of X+(F) 
-cSuperkey(R, F, X) :-
-  cClose(X, F, XClosed), subset(R, XClosed).
-
-% X->A is trivial if A is an element of X
-cTrivial(X->A) :-
-  memberchk(A, X).
-
-% S is the superkeys of scheme R with FDs F
-cSuperKeys(R, F, S) :-
-  powerSet(R, Hatv),
-  findall(X, (member(X, Hatv), cSuperkey(R, F, X)), S).
-
-% a key K is minimal if no real subset of K is a superkey
-cMinimal(X, SuperKeys) :-
-  \+ bagof(K, (member(K, SuperKeys), K \= X, subset(K, X)), _).
-%             ^ looking for real subsets of X in the set of SuperKeys
-% if we found one, the superkey is not minimal -> the negation causes the clause to fail
-
-% key: 1) superkey 2) minimal
-cKeys(R, F, Keys) :-
-  cSuperKeys(R, F, SuperKeys),
-  findall(X, (member(X, SuperKeys), cMinimal(X, SuperKeys)), Keys).
-
-% cPrimary attributumok: elemei valamelyik kulcsnak
-cPrimary(R, F, A) :-
-  cKeys(R, F, Keys),
-  union(Keys, PrimaryAttributes),
-  memberchk(A, PrimaryAttributes).
-
-% ==================== BCNF ===================
-% for all X->A in we check if it satisfies BCNF
-cTestBCNF(R, F) :-
-  findall(XA, (member(XA, F), cSatisfiesBCNF(R, F, XA)), L),
-  subset(F, L).
-
-% X->A non-trivial FD satisfies BCNF if X is a superkey
-cSatisfiesBCNF(R, F, X->A) :-
-  ( cTrivial(X->A)
-  ; cSuperkey(R, F, X)
-  ).
-
-% ==================== 3NF ====================
-cTest3NF(R, F) :-
-  findall(XA, (member(XA, F), cSatisfies3NF(R, F, XA)), L),
-  subset(F, L).
-
-% X->A non-trivial FD satisfies 3NF if X is a superkey or A is a primary attribute
-cSatisfies3NF(R, F, X->A) :- 
-  ( cTrivial(X->A)
-  ; cSuperkey(R, F, X)
-  ; cPrimary(R, F, A)
-  ).
+canonicalFD(C, P) :-
+  prettyFD(P, C).
   
-% ==================== 2NF ==================== 
-cTest2NF(R, F) :-
-  cKeys(R, F, Keys),
-  union(Keys, PrimaryAttributes),
-  subtract(R, PrimaryAttributes, SecondaryAttributes),
-  \+ bagof(K->A, (member(K, Keys), member(A, SecondaryAttributes), \+ cSatisfies2NF(F, K->A)), _).
-     % collect the solutions of key->secondary attribute FDs
-
-% K->A (where K is a key, A is a secondary attribute) satisfies 2NF if no real subset X of K exist such that X->A
-cSatisfies2NF(F, K->A) :-
-  powerSet(K, KSubsets),
-  subtract(KSubsets, [K], KRealSubsets),
-  \+ bagof(X, (member(X, KRealSubsets), cClose(X, F, XClosed), memberchk(A, XClosed)), _).
-
-% ============ highest normal form =============
-cNF(R, F, NF) :-
-  ( cTestBCNF(R, F) -> NF = nfBCNF
-  ; cTest3NF(R, F)  -> NF = nf3NF
-  ; cTest2NF(R, F)  -> NF = nf2NF
-  ; NF = nf1NF
-  ).
-
-% 1st step of minimalizing
-%   all FDs may have a single attribute on their right side
-cSingleRightSide(F, FFormatted) :-
-  foldl(F, fd:cDecompose, [], F0),
-  lists:reverse(F0, FFormatted).
-
-% decomposing right side of a FD (consequence of Armstrong's axioms)
-cDecompose(X->Y, F, F1) :-
-  ( Y = [A|Yt] -> cDecompose(X->Yt, [X->A|F], F1)
-  ; F1 = F
-  ).
-
-% 2nd step of minimalizing
-%   omitting superfluous attributes from the left side of FDs
-cMinimalizeLeftSide(F, FLeftRed) :-
-  retractall(leftred(_)),
-  cMinimalizeLeftSide(F, F, FLeftRed, false).
-
-cMinimalizeLeftSide([], FLeftRed, FLeftRed, false) :-
-  \+ leftred(FReduced), assert(leftred(FReduced)).
-cMinimalizeLeftSide([X->A|T], F, FLeftRed, SkippedFlag) :-
-  ( cCsokkentheto(X->A, F, Y),
-    subtract(F, [X->A], F0),
-    union(F0, [Y->A], F1),
-    ( cMinimalizeLeftSide(F1, FLeftRed) % az egeszet elolrol
-    ; cMinimalizeLeftSide(T, F, FLeftRed, true) % skipped flaget true-ra
-    )
-  ; \+ cCsokkentheto(X->A, F, Y), cMinimalizeLeftSide(T, F, FLeftRed, SkippedFlag)
-  ).
-
-% 3rd step of minimalizing
-%   skipping deducible FDs
-cSkipFDs(F, FMin) :-
-  cSkipFDs(F, F, FMin, false).
+nf(R, F, N) :-
+  atom_to_list(R, R0),
+  canonicalFDs(F, F0),
+  cSingleRightSide(F0, F1),
+  cNF(R0, F1, N).
   
-% we may skip X->A if A is in (X)+(G), where G is F \ {X->A}
-% cSkipFDs(tail of FDs, all FDs, minimalised FDs, reduced bit)
-cSkipFDs([], FReduced, FReduced, false).
-cSkipFDs([X->A|T], F, FReduced, SkippedFlag) :-
-  subtract(F, [X->A], G),                    % G = F \ {X->A}
-  cClose(X, G, XClosed),                     % calculating X+(G)
-  ( memberchk(A, XClosed) ->                 % A is in X+(G)
-    ( cSkipFDs(G, FReduced)
-    ; cSkipFDs(T, F, FReduced, true)
-    )
-  ; cSkipFDs(T, F, FReduced, SkippedFlag)
-  ).
-  
-cCsokkentheto(X->A, F, Y) :-
-  cBalRed(X, X->A, F, Y).
-  
-cBalRed([H|T], X->A, F, Y) :-
-  subtract(X, [H], X0),
-  cClose(X0, F, X0C),
-  ( memberchk(A, X0C), Y = X0
-  ; cBalRed(T, X->A, F, Y)
-  ).  
+fmin(F, Fmin) :-
+  canonicalFDs(F, F0),
+  cFmin(F0, F1),
+  prettyFDs(F1, Fmin).
 
-cFmin(F, FMin) :-
-  retractall(minimal(_)),
-  cSingleRightSide(F, F1),
-  cSkipFDs(F1, F2),
-  cMinimalizeLeftSide(F2, F3),
-%  cMinimalizeLeftSide(F1, F2),
-%  cSkipFDs(F2, F3),
-  sort(F3, FMin),
-  \+ minimal(FMin), assert(minimal(FMin)).
-
-cFsubset([], _G).
-cFsubset([X->A|T], G) :-
-  cClose(X, G, XClosed),
-  memberchk(A, XClosed),
-  cFsubset(T, G).
-
-cFequiv(F, G) :-
-  cFsubset(F, G),
-  cFsubset(G, F).
+fequiv(F, G) :-
+  canonicalFDs(F, F0),
+  canonicalFDs(G, G0),
+  cSingleRightSide(F0, F1),
+  cSingleRightSide(G0, G1),
+  cFequiv(F1, G1).
