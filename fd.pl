@@ -1,6 +1,6 @@
-:- module(fdp, [nf/3, fmin/2, fequiv/2]).
+:- module(fd, [nf/3, fmin/2, fequiv/2]).
 :- use_module(functional).
-:- use_module(fd).
+:- use_module(fdc).
 :- use_module(library(lists)).
 
 % convert atom to list of one-character atoms and backwards
@@ -14,7 +14,7 @@ atom_to_list(A, L) :-
 
 % from pretty to canonical
 prettyFDs(FC, FP) :-
-  map(FC, fdp:prettyFD, FP).
+  map(FC, fd:prettyFD, FP).
 
 prettyFD(XL->YL, XA->YA) :-
   atom_to_list(XA, XL),
@@ -22,7 +22,7 @@ prettyFD(XL->YL, XA->YA) :-
   
 % from canonical to pretty
 canonicalFDs(FC, FP) :-
-  map(FC, fdp:canonicalFD, FP).
+  map(FC, fd:canonicalFD, FP).
 
 canonicalFD(C, P) :-
   prettyFD(P, C).

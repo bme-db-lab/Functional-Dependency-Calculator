@@ -1,4 +1,4 @@
-:- module(fd, [cSingleRightSide/2, cNF/3, cFmin/2, cFequiv/2]).
+:- module(fdc, [cSingleRightSide/2, cNF/3, cFmin/2, cFequiv/2]).
 :- use_module(functional).
 :- use_module(sets).
 :- dynamic(leftred/1).  
@@ -10,7 +10,7 @@
 % XClosed = X+(F)
 cClose(X, F, XClosed) :-
   ( X = [] -> XClosed = []
-  ; foldr(F, fd:cExpand, X, X0),
+  ; foldr(F, fdc:cExpand, X, X0),
     ( X = X0 -> XClosed = X0
     ; cClose(X0, F, XClosed)
     )
@@ -83,8 +83,8 @@ cTest2NF(R, F) :-
   cKeys(R, F, Keys),
   union(Keys, PrimaryAttributes),
   subtract(R, PrimaryAttributes, SecondaryAttributes),
+  % collect the solutions of key->secondary attribute FDs
   \+ bagof(K->A, (member(K, Keys), member(A, SecondaryAttributes), \+ cSatisfies2NF(F, K->A)), _).
-     % collect the solutions of key->secondary attribute FDs
 
 % K->A (where K is a key, A is a secondary attribute) satisfies 2NF if no real subset X of K exist such that X->A
 cSatisfies2NF(F, K->A) :-
@@ -103,7 +103,7 @@ cNF(R, F, NF) :-
 % 1st step of minimalizing
 %   all FDs may have a single attribute on their right side
 cSingleRightSide(F, FFormatted) :-
-  foldl(F, fd:cDecompose, [], F0),
+  foldl(F, fdc:cDecompose, [], F0),
   lists:reverse(F0, FFormatted).
 
 % decomposing right side of a FD (consequence of Armstrong's axioms)
@@ -121,13 +121,13 @@ cMinimalizeLeftSide(F, FLeftRed) :-
 cMinimalizeLeftSide([], FLeftRed, FLeftRed, false) :-
   \+ leftred(FReduced), assert(leftred(FReduced)).
 cMinimalizeLeftSide([X->A|T], F, FLeftRed, SkippedFlag) :-
-  ( cCsokkentheto(X->A, F, Y),
+  ( cReducible(X->A, F, Y),
     subtract(F, [X->A], F0),
     union(F0, [Y->A], F1),
-    ( cMinimalizeLeftSide(F1, FLeftRed) % az egeszet elolrol
-    ; cMinimalizeLeftSide(T, F, FLeftRed, true) % skipped flaget true-ra
+    ( cMinimalizeLeftSide(F1, FLeftRed)
+    ; cMinimalizeLeftSide(T, F, FLeftRed, true)
     )
-  ; \+ cCsokkentheto(X->A, F, Y), cMinimalizeLeftSide(T, F, FLeftRed, SkippedFlag)
+  ; \+ cReducible(X->A, F, Y), cMinimalizeLeftSide(T, F, FLeftRed, SkippedFlag)
   ).
 
 % 3rd step of minimalizing
@@ -148,14 +148,14 @@ cSkipFDs([X->A|T], F, FReduced, SkippedFlag) :-
   ; cSkipFDs(T, F, FReduced, SkippedFlag)
   ).
   
-cCsokkentheto(X->A, F, Y) :-
-  cBalRed(X, X->A, F, Y).
+cReducible(X->A, F, Y) :-
+  cLeftRed(X, X->A, F, Y).
   
-cBalRed([H|T], X->A, F, Y) :-
+cLeftRed([H|T], X->A, F, Y) :-
   subtract(X, [H], X0),
   cClose(X0, F, X0C),
   ( memberchk(A, X0C), Y = X0
-  ; cBalRed(T, X->A, F, Y)
+  ; cLeftRed(T, X->A, F, Y)
   ).  
 
 cFmin(F, FMin) :-
@@ -163,8 +163,6 @@ cFmin(F, FMin) :-
   cSingleRightSide(F, F1),
   cSkipFDs(F1, F2),
   cMinimalizeLeftSide(F2, F3),
-%  cMinimalizeLeftSide(F1, F2),
-%  cSkipFDs(F2, F3),
   sort(F3, FMin),
   \+ minimal(FMin), assert(minimal(FMin)).
 

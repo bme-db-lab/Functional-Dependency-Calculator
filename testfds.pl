@@ -1,4 +1,4 @@
-:- use_module(fdp).
+:- use_module(fd).
 
 writeList([]).
 writeList([H|T]) :-
