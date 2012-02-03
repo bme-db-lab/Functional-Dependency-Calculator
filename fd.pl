@@ -44,3 +44,12 @@ fequiv(F, G) :-
   cSingleRightSide(F0, F1),
   cSingleRightSide(G0, G1),
   cFequiv(F1, G1).
+
+keys(R, F, Keys) :-
+  cKeys(R, F, Keys).
+  
+primaryAttributes(R, F, PrimaryAttributes) :-
+  cPrimaryAttributes(R, F, PrimaryAttributes).
+
+secondaryAttributes(R, F, SecondaryAttributes) :-
+  cSecondaryAttributes(R, F, SecondaryAttributes).

@@ -48,12 +48,21 @@ cKeys(R, F, Keys) :-
   cSuperKeys(R, F, SuperKeys),
   findall(X, (member(X, SuperKeys), cMinimal(X, SuperKeys)), Keys).
 
-% primary attributes: member of some key
-cPrimary(R, F, A) :-
+% set of primary attributes
+cPrimaryAttributes(R, F, PrimaryAttributes) :-
   cKeys(R, F, Keys),
-  union(Keys, PrimaryAttributes),
+  union(Keys, PrimaryAttributes).
+  
+% set of secondary attributes
+cSecondaryAttributes(R, F, SecondaryAttributes) :-
+  cPrimaryAttributes(R, F, PrimaryAttributes),
+  subtract(R, PrimaryAttributes, SecondaryAttributes).
+  
+% is primary attribute
+cPrimary(R, F, A) :-
+  cPrimaryAttributes(R, F, PrimaryAttributes),
   memberchk(A, PrimaryAttributes).
-
+  
 % ==================== BCNF ===================
 % for all X->A in we check if it satisfies BCNF
 cTestBCNF(R, F) :-
@@ -81,8 +90,7 @@ cSatisfies3NF(R, F, X->A) :-
 % ==================== 2NF ==================== 
 cTest2NF(R, F) :-
   cKeys(R, F, Keys),
-  union(Keys, PrimaryAttributes),
-  subtract(R, PrimaryAttributes, SecondaryAttributes),
+  cSecondaryAttributes(R, F, SecondaryAttributes),
   % collect the solutions of key->secondary attribute FDs
   \+ bagof(K->A, (member(K, Keys), member(A, SecondaryAttributes), \+ cSatisfies2NF(F, K->A)), _).
 
