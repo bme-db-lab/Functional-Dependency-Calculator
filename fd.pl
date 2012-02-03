@@ -1,4 +1,4 @@
-:- module(fd, [nf/3, fmin/2, fequiv/2]).
+:- module(fd, [nf/3, fmin/2, fequiv/2, keys/3, primaryattributes/3, secondaryattributes/3]).
 :- use_module(functional).
 :- use_module(fdc).
 :- use_module(library(lists)).
@@ -46,10 +46,17 @@ fequiv(F, G) :-
   cFequiv(F1, G1).
 
 keys(R, F, Keys) :-
-  cKeys(R, F, Keys).
+  atom_to_list(R, R0),
+  canonicalFDs(F, F0),
+  cSingleRightSide(F0, F1),
+  cKeys(R0, F1, Keys).
   
-primaryAttributes(R, F, PrimaryAttributes) :-
-  cPrimaryAttributes(R, F, PrimaryAttributes).
+primaryattributes(R, F, PrimaryAttributes) :-
+  atom_to_list(R, R0),
+  canonicalFDs(F, F0),
+  cPrimaryAttributes(R0, F0, PrimaryAttributes).
 
-secondaryAttributes(R, F, SecondaryAttributes) :-
-  cSecondaryAttributes(R, F, SecondaryAttributes).
+secondaryattributes(R, F, SecondaryAttributes) :-
+  atom_to_list(R, R0),
+  canonicalFDs(F, F0),
+  cSecondaryAttributes(R0, F0, SecondaryAttributes).

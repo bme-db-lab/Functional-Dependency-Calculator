@@ -1,4 +1,4 @@
-:- module(fdc, [cSingleRightSide/2, cNF/3, cFmin/2, cFequiv/2]).
+:- module(fdc, [cSingleRightSide/2, cNF/3, cFmin/2, cFequiv/2, cKeys/3, cPrimaryAttributes/3, cSecondaryAttributes/3]).
 :- use_module(functional).
 :- use_module(sets).
 :- dynamic(leftred/1).  
