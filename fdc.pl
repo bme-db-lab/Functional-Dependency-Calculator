@@ -161,8 +161,8 @@ cLeftRed([H|T], X->A, F, Y) :-
 cFmin(F, FMin) :-
   retractall(minimal(_)),
   cSingleRightSide(F, F1),
-  cSkipFDs(F1, F2),
-  cMinimalizeLeftSide(F2, F3),
+  cMinimalizeLeftSide(F1, F2),
+  cSkipFDs(F2, F3),
   sort(F3, FMin),
   \+ minimal(FMin), assert(minimal(FMin)).
 

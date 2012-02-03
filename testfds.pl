@@ -43,8 +43,10 @@ testfds :-
   write('\nCalculating minimal cover(s)\n'),
   write('===========================================================\n\n'),
   
-  testFmin([cd->e,ab->cd,d->a,a->b,b->ac]),
-  testFmin([no->p, l->m, lm->no, m->ln, o->l]),
-  testFmin([a->b, ab->cd, b->ac, cd->e, d->a]),
+  testFmin([a->b, ab->d, b->a, d->a]),
+  testFmin([cd->e, ab->cd, d->a, a->b, b->ac]),
+  testFmin([abcd->e, e->d, a->b, ac->d]),
+  %testFmin([no->p, l->m, lm->no, m->ln, o->l]),
+  %testFmin([a->b, ab->cd, b->ac, cd->e, d->a]),
   
   true.
