@@ -1,9 +1,9 @@
-:- module(fdc, [cSingleRightSide/2, cNF/3, cFmin/2, cFequiv/2, cKeys/3, cPrimaryAttributes/3, cSecondaryAttributes/3]).
+:- module(fdc, [cSingleRightSide/2, cNF/3, cFmin/2, cFequiv/2, cKeys/3, cPrimaryAttributes/3, cSecondaryAttributes/3, cFclose/3, cBCNF/3]).
 :- use_module(functional).
 :- use_module(sets).
 :- dynamic(leftred/1).  
 :- dynamic(minimal/1).  
-
+:- dynamic(bcnfdecomposition/1).
 % operator for readable FDs
 :- op(800, xfx, ->).
   
@@ -183,3 +183,52 @@ cFsubset([X->A|T], G) :-
 cFequiv(F, G) :-
   cFsubset(F, G),
   cFsubset(G, F).
+
+cNonTrivialClosures([], _, []).
+cNonTrivialClosures([H|T], F, FClosed) :-
+  cNonTrivialClosures(T, F, TClosed),
+  cClose(H, F, HClosed),
+  subtract(HClosed, H, HClosedNonTrivial),
+  ( HClosedNonTrivial = [] -> FClosed = TClosed
+  ; FClosed = [H->HClosedNonTrivial|TClosed]
+  ).
+
+cFclose(R, F, FClosed) :-
+  powerSet(R, RP),
+  cNonTrivialClosures(RP, F, FClosed0),
+  cSingleRightSide(FClosed0, FClosed).
+
+cFilterProjected([], _, []).
+cFilterProjected([X->A|T], S, FF) :-
+  cFilterProjected(T, S, TFF),
+  ( memberchk(A, S) -> FF = [X->A|TFF]
+  ; FF = TFF
+  ).
+  
+% FP is the set of projected FDs on F 
+cProjectFDs(F, S, FP) :-
+  cFclose(S, F, FP0),
+  cFilterProjected(FP0, S, FP).
+
+cBCNF(S, G, Rho) :-
+  retractall(bcnfdecomposition(_)),
+  cDecomposeToBCNF(S, G, Rho0),
+  sort(Rho0, Rho).
+  %\+ bcnfdecomposition(Rho),
+  %assert(bcnfdecomposition(Rho)).
+  
+cDecomposeToBCNF(S, G, Rho) :-  
+  findall(XA, (member(XA, G), cSatisfiesBCNF(S, G, XA)), SatisfyingBCNF),
+  subtract(G, SatisfyingBCNF, ViolatingBCNF),
+  ( member(X->A, ViolatingBCNF),
+    (
+      union(X, [A], S1),
+      subtract(S, [A], S2),
+      cProjectFDs(G, S1, G1),
+      cProjectFDs(G, S2, G2),
+      cDecomposeToBCNF(S1, G1, Rho1),
+      cDecomposeToBCNF(S2, G2, Rho2),
+      append(Rho1, Rho2, Rho)
+    )
+  ; ViolatingBCNF = [], Rho = [S]
+  ).
