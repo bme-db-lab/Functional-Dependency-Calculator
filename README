@@ -14,9 +14,9 @@ Usage (SWI-Prolog):
 true.
 
 2 ?- fmin([cd->e,ab->cd,d->a,a->b,b->ac], FMin).
-FMin = [ (a->b), (b->a), (b->c), (b->d), (d->a), (d->e)] ;
+FMin = [ (a->b), (b->c), (b->d), (d->a), (d->e)] ;
 FMin = [ (a->b), (a->d), (b->a), (b->c), (d->a), (d->e)] ;
-FMin = [ (a->b), (a->c), (b->a), (b->d), (d->a), (d->e)] ;
+FMin = [ (a->b), (a->c), (b->d), (d->a), (d->e)] ;
 FMin = [ (a->b), (a->c), (a->d), (b->a), (d->a), (d->e)] ;
 false.
 
