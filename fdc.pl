@@ -213,9 +213,9 @@ cProjectFDs(F, S, FP) :-
 cBCNF(S, G, Rho) :-
   retractall(bcnfdecomposition(_)),
   cDecomposeToBCNF(S, G, Rho0),
-  sort(Rho0, Rho).
-  %\+ bcnfdecomposition(Rho),
-  %assert(bcnfdecomposition(Rho)).
+  sort(Rho0, Rho),
+  \+ bcnfdecomposition(Rho),
+  assert(bcnfdecomposition(Rho)).
   
 cDecomposeToBCNF(S, G, Rho) :-  
   findall(XA, (member(XA, G), cSatisfiesBCNF(S, G, XA)), SatisfyingBCNF),
