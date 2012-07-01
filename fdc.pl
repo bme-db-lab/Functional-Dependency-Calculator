@@ -4,6 +4,7 @@
 :- dynamic(leftred/1).  
 :- dynamic(minimal/1).  
 :- dynamic(bcnfdecomposition/1).
+
 % operator for readable FDs
 :- op(800, xfx, ->).
   
