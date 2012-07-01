@@ -26,7 +26,7 @@ false.
 NF = nf3NF.
 ```
 
-To run the test compile testfds.pl and run type "testfds."
+To run the test compile ```testfds.pl``` and run type ```testfds.```
 
 ```
 1 ?- [testfds].
