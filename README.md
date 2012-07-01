@@ -45,4 +45,4 @@ Start the service with the following command:
 swipl -f ws.pl -g start
 ```
 
-Visit the http://localhost:5000/ page and try the examples.
+Visit http://localhost:5000/ and try the examples.
