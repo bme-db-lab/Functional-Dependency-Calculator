@@ -6,8 +6,8 @@
 :- use_module(fd_parser).
 :- use_module(fd).
 
-:- http_handler(root(.),      list_modules, []).
-% :- http_handler(root(mmodule), list_module, []).
+:- http_handler(root(nf), httpNF, []).
+:- http_handler(root(fmin), httpFMin, []).
 
 % http://localhost:5000/?r=abcdef&f=ab-%3Ec,%20cd-%3Ee,%20f-%3Ea
 
@@ -23,12 +23,11 @@ restart :-
 server(Port) :-
 	http_server(http_dispatch, [port(Port)]).
 
-test(R, F, N) :-
-        parse_fds(F, FD),
-        FD = N.       
-        %nf(R, FD, N).
+reply(Text) :-
+        format('Content-type: text/plain~n~n'),
+        format(Text).
 
-list_modules(Request) :-
+httpNF(Request) :-
 	http_parameters(Request,
           [
             r(R, []),
@@ -36,13 +35,15 @@ list_modules(Request) :-
           ]),
         parse_fds(F, FD),
         nf(R, FD, N),
-        reply_html_page(title('Functional Dependency Calculator'),
+        reply(N).
+
+httpFMin(Request) :-
+	http_parameters(Request,
           [
-            %h1('FD calculator'),
-            %'R(', R, '), F={', F, '}',
-            %div('normal form:', N)
-            N
-          ]).
-
-
+            f(F, [])
+          ]),
+        parse_fds(F, FD),
+        fmin(FD, FMin),
+        fds_to_string(FMin, FMinS),
+        reply(FMinS).
 
