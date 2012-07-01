@@ -1,4 +1,5 @@
 Functional Dependency Calculator
+================================
 Gabor Szarnyas, 2012.
 
 Little Prolog tool for performing simple algorithms on functional dependency sets.
@@ -30,3 +31,8 @@ true.
 
 2 ?- testfds.
 ...
+
+Starting the web service from command line
+------------------------------------------
+
+swipl -f ws.pl -g start
