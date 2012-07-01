@@ -10,6 +10,7 @@ Currently supported:
 Compatible with SICStus Prolog and SWI-Prolog.
 
 Usage (SWI-Prolog):
+```
 1 ?- [fd].
 %  ...
 true.
@@ -23,16 +24,23 @@ false.
 
 3 ?- nf(abcdef, [a->b, b->c, c->a, d->e, e->f, f->d], NF).
 NF = nf3NF.
+```
 
 To run the test compile testfds.pl and run type "testfds."
+
+```
 1 ?- [testfds].
 %  ...
 true.
 
 2 ?- testfds.
 ...
+```
 
 Starting the web service from command line
 ------------------------------------------
 
+```
 swipl -f ws.pl -g start
+```
+
