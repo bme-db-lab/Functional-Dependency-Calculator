@@ -7,7 +7,7 @@ Currently supported:
  - minimal cover of an FD set
  - highest normal form of a relational schema
  
-Compatible with SICStus Prolog and SWI-Prolog.
+Compatible with SWI-Prolog (http://www.swi-prolog.org/) and SICStus Prolog.
 
 Usage (SWI-Prolog):
 ```
@@ -40,7 +40,9 @@ true.
 Starting the web service from command line
 ------------------------------------------
 
+Start the service with the following command:
 ```
 swipl -f ws.pl -g start
 ```
 
+Visit http://localhost:5000/ and try the examples.
