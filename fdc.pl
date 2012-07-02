@@ -1,13 +1,27 @@
-:- module(fdc, [cSingleRightSide/2, cNF/3, cFmin/2, cFequiv/2, cKeys/3, cPrimaryAttributes/3, cSecondaryAttributes/3, cFclose/3, cBCNF/3]).
+:- module(fdc, [cSingleRightSide/2, cNF/3, cFmin/2, cFequiv/2, cKeys/3, cPrimaryAttributes/3, cSecondaryAttributes/3, cFclose/3, cBCNF/3, c3NF/3, cDecomposeTo3NF/3]).
 :- use_module(functional).
 :- use_module(sets).
 :- dynamic(leftred/1).  
 :- dynamic(minimal/1).  
 :- dynamic(bcnfdecomposition/1).
+:- dynamic(d3nfdecomposition/1).
 
 % operator for readable FDs
 :- op(800, xfx, ->).
-  
+
+% the code relies heavily on backtracking, so it's worth noting
+% that the -> operator destroyes choice-points created inside the clause.
+% so instead of 
+% ( Condition -> Then
+% ; Else
+% )
+% we have to use
+% ( Condition, "Then"...
+% ; \+ Condition, "Else"...
+% )
+% to let backtrack work.
+% see also: http://www.swi-prolog.org/pldoc/man?predicate=send_arrow%2f2
+
 % XClosed = X+(F)
 cClose(X, F, XClosed) :-
   ( X = [] -> XClosed = []
@@ -211,16 +225,19 @@ cProjectFDs(F, S, FP) :-
   cFclose(S, F, FP0),
   cFilterProjected(FP0, S, FP).
 
+% enumerate the next BCNF decomposition
 cBCNF(S, G, Rho) :-
   retractall(bcnfdecomposition(_)),
   cDecomposeToBCNF(S, G, Rho0),
   sort(Rho0, Rho),
   \+ bcnfdecomposition(Rho),
   assert(bcnfdecomposition(Rho)).
-  
+
+
+% decompose to BCNF
 cDecomposeToBCNF(S, G, Rho) :-  
   findall(XA, (member(XA, G), cSatisfiesBCNF(S, G, XA)), SatisfyingBCNF),
-  subtract(G, SatisfyingBCNF, ViolatingBCNF),
+  subtract(G, SatisfyingBCNF, ViolatingBCNF), % find the FDs that violate the BCNF property
   ( member(X->A, ViolatingBCNF),
     (
       union(X, [A], S1),
@@ -233,3 +250,36 @@ cDecomposeToBCNF(S, G, Rho) :-
     )
   ; ViolatingBCNF = [], Rho = [S]
   ).
+
+% enumerate the next BCNF decomposition
+c3NF(S, G, Rho) :-
+  retractall(d3nfdecomposition(_)),
+  cDecomposeTo3NF(S, G, Rho0),
+  sort(Rho0, Rho),
+  \+ d3nfdecomposition(Rho),
+  assert(d3nfdecomposition(Rho)).
+
+% decompose to 3NF
+cDecomposeTo3NF(S, G, Rho) :-
+  cSingleRightSide(G, G0),
+  cKeys(S, G0, Keys),                       % determine the keys
+  member(Key, Keys),                        % pick a key
+  cFmin(G, GMin),                           % determine a possible minimal FD set
+  map(GMin, fdc:cDependencyToScheme, Rho0), % convert the minimal FD set to relational schemes
+  ( hasSuperSet(Rho0, Key) -> Rho = Rho0    % it contains the key, there is no need to add 
+  ; union(Rho0, [Key], Rho1), sort(Rho1, Rho)
+  ).
+
+% converts a (canonical) minimal FD to relational scheme,
+% e.g. [a, b]->e becomes [a, b, e]
+cDependencyToScheme(X->Y, R) :-
+  union(X, [Y], R0),
+  sort(R0, R).
+
+% returns if there is a set in a list of sets L which is a superset of S
+hasSuperSet(L, S) :-
+  member(E, L), !,
+  ( call(subset, S, E), !
+  ; L = [_|T], hasSuperSet(T, S)
+  ).
+

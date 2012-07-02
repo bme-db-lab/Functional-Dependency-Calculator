@@ -1,7 +1,8 @@
-:- module(fd, [nf/3, fmin/2, fequiv/2, keys/3, primaryattributes/3, secondaryattributes/3, fclose/3, bcnf/3, bcnftest/1]).
+:- module(fd, [nf/3, fmin/2, fequiv/2, keys/3, primaryattributes/3, secondaryattributes/3, fclose/3, bcnf/3, bcnfs/3, d3nf/3, d3nfs/3]).
 :- use_module(functional).
 :- use_module(fdc).
 :- use_module(library(lists)).
+:- use_module(library(time)).
 
 % convert atom to list of one-character atoms and backwards
 % myatom <---> [m, y, a, t, o, m]
@@ -85,6 +86,7 @@ fclose(R, F, FClosed) :-
   cFclose(R0, F1, FClosed0),
   prettyFDs(FClosed0, FClosed).
 
+% decomposition to BCNF schemes
 bcnf(R, F, Rho) :-
   atom_to_list(R, R0),
   canonicalFDs(F, F0),
@@ -92,6 +94,35 @@ bcnf(R, F, Rho) :-
   cBCNF(R0, F1, Rho0),
   list_of_atom_to_list(Rho, Rho0).
 
-bcnftest(Len) :-
-  findall(N, bcnf(itkoscmpd, [it->k, t->oscm, cm->pd, p->c], N), L),
-  length(L, Len).
+% bcnfs(abcde, [ab->cd, b->e, d->e], Rhos).
+% bcnf(itkoscmpd, [it->k, t->oscm, cm->pd, p->c], Rhos).
+
+% convert a scheme decomposition (set of atoms) to readable text
+decomposition_to_text(L, L0) :-
+  atomic_list_concat(L, ', ', L0).
+
+% decomposition to 3NF schemes
+d3nf(R, F, Rho) :-
+  atom_to_list(R, R0),
+  canonicalFDs(F, F0),
+  c3NF(R0, F0, Rho0),
+  list_of_atom_to_list(Rho, Rho0).
+
+% aggregate all BCNF decompositions
+bcnfs_all(R, F, Rhos) :-
+  findall(Rho, bcnf(R, F, Rho), Rhos).
+
+bcnfs(R, F, Rhos) :-
+  call_with_time_limit(1, bcnfs_all(R, F, Rhos0)),
+  map(Rhos0, fd:decomposition_to_text, Rhos1),
+  atomic_list_concat(Rhos1, '~n', Rhos).
+
+% aggregate all 3NF decompositons
+d3nfs_all(R, F, Rhos) :-
+  findall(Rho, d3nf(R, F, Rho), Rhos).
+
+d3nfs(R, F, Rhos) :-
+  call_with_time_limit(1, d3nfs_all(R, F, Rhos0)),
+  map(Rhos0, fd:decomposition_to_text, Rhos1),
+  atomic_list_concat(Rhos1, '~n', Rhos).
+

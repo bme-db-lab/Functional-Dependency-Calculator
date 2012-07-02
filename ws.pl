@@ -12,7 +12,8 @@
 :- http_handler(root(keys), httpKeys, []).
 :- http_handler(root(primaryattributes), httpPrimaryAttributes, []).
 :- http_handler(root(secondaryattributes), httpSecondaryAttributes, []).
-:- http_handler(root(fclose), httpFClose, []).
+:- http_handler(root(bcnfs), httpBCNFs, []).
+:- http_handler(root(d3nfs), http3NFs, []).
 
 start :-
     server(5000).
@@ -49,6 +50,8 @@ httpRoot(_) :-
     format('    <li><a href="keys?r=abcdef&f=a->b,b->c">keys</a></li>~n'),
     format('    <li><a href="primaryattributes?r=abcdef&f=a->b,b->c">primaryattributes</a></li>~n'),
     format('    <li><a href="secondaryattributes?r=abcdef&f=a->b,b->c">secondaryattributes</a></li>~n'),
+    format('    <li><a href="bcnfs?r=abcde&f=ab->cd, b->e, d->e">bcnf</a></li>~n'),
+    format('    <li><a href="d3nfs?r=abcde&f=ab->cd, b->e, d->e">d3nfs</a></li>~n'),
     format('  </ul>~n'),
     format('</body>~n'),
     format('</html>~n').
@@ -110,4 +113,26 @@ httpSecondaryAttributes(Request) :-
     secondaryattributes(R, F0, SecondaryAttributes),
     null_to_empty(SecondaryAttributes, SecondaryAttributes0),
     reply(SecondaryAttributes0).
+
+% BCNF decompositions
+httpBCNFs(Request) :-
+    http_parameters(Request,
+      [
+        r(R, []),
+        f(F, [])
+      ]),
+    parse_fds(F, F0),
+    bcnfs(R, F0, Rhos),
+    reply(Rhos).
+
+% 3NF decompositions
+http3NFs(Request) :-
+    http_parameters(Request,
+      [
+        r(R, []),
+        f(F, [])
+      ]),
+    parse_fds(F, F0),
+    d3nfs(R, F0, Rhos),
+    reply(Rhos).
 
