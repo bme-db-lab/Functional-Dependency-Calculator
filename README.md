@@ -39,6 +39,7 @@ true.
 
 Architecture
 -------------
+```
 ┌───────────────────────┐      ┌────────────────────┐
 │ web frontend          │      │  Prolog console    │
 │ [e.g. HTML+AJAX page] │      │ [e.g. SWI─Prolog]  │
@@ -56,6 +57,7 @@ Architecture
 ┌───────────────────────┴───────────────────────────┐
 │   Functional Dependency Calculator core (fdc.pl)  │
 └───────────────────────────────────────────────────┘
+```
 
 Starting the web service from command line
 ------------------------------------------
