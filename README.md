@@ -16,13 +16,13 @@ Architecture
 ------------
 ```
 ┌───────────────────────┐   ┌────────────────────────┐
-│ web frontend          │   │  Prolog console        │
-│ [e.g. HTML+AJAX page] │   │ [e.g. SWI─Prolog]      │
+│     web frontend      │   │    Prolog console      │
+│ [e.g. HTML+AJAX page] │   │   [e.g. SWI─Prolog]    │
 └───────────┬───────────┘   └────────────┬───────────┘
             │                            │            
 ┌───────────┴───────────┐                │            
-│ web service (ws.pl)   │                │            
-│    [SWI-Prolog]       │                │            
+│  web service (ws.pl)  │                │            
+│     [SWI-Prolog]      │                │            
 └───────────┬───────────┘                │            
             │                            │            
 ┌───────────┴────────────────────────────┴───────────┐
