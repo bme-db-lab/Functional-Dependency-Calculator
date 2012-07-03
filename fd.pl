@@ -1,8 +1,9 @@
-:- module(fd, [nf/3, fmin/2, fequiv/2, keys/3, primaryattributes/3, secondaryattributes/3, fclose/3, bcnf/3, bcnfs/3, d3nf/3, d3nfs/3]).
+:- module(fd, [nf/3, fmin/2, fmins/2, fequiv/2, keys/3, primaryattributes/3, secondaryattributes/3, fclose/3, bcnf/3, bcnfs/3, d3nf/3, d3nfs/3]).
 :- use_module(functional).
 :- use_module(fdc).
 :- use_module(library(lists)).
 :- use_module(library(time)).
+:- use_module(fd_parser).
 
 % convert atom to list of one-character atoms and backwards
 % myatom <---> [m, y, a, t, o, m]
@@ -43,11 +44,8 @@ nf(R, F, N) :-
   canonicalFDs(F, F0),
   cSingleRightSide(F0, F1),
   cNF(R0, F1, N).
-  
-fmin(F, Fmin) :-
-  canonicalFDs(F, F0),
-  cFmin(F0, F1),
-  prettyFDs(F1, Fmin).
+
+% ========== ==========
 
 fequiv(F, G) :-
   canonicalFDs(F, F0),
@@ -76,7 +74,20 @@ secondaryattributes(R, F, SecondaryAttributes) :-
   canonicalFDs(F, F0),
   cSingleRightSide(F0, F1),
   cSecondaryAttributes(R0, F1, SecondaryAttributes0),
-  sort(SecondaryAttributes0, SecondaryAttributes1),
+  sort(SecondaryAttr
+% ========= FMin ==========
+fmin(F, Fmin) :-
+  canonicalFDs(F, F0),
+  cFmin(F0, F1),
+  prettyFDs(F1, Fmin).
+
+fmin_all(F, FMins) :-
+  findall(FMin, fmin(F, FMin), FMins).
+
+fmins(F, FMins) :-
+  call_with_time_limit(1, fmins_all(F, FMins0)),
+  map(FMins0, fd_parser:fds_to_string, FMins1),
+  atomic_list_concat(FMins1, '~n', FMins).ibutes0, SecondaryAttributes1),
   atom_to_list(SecondaryAttributes, SecondaryAttributes1).
 
 fclose(R, F, FClosed) :-
@@ -86,14 +97,6 @@ fclose(R, F, FClosed) :-
   cFclose(R0, F1, FClosed0),
   prettyFDs(FClosed0, FClosed).
 
-% decomposition to BCNF schemes
-bcnf(R, F, Rho) :-
-  atom_to_list(R, R0),
-  canonicalFDs(F, F0),
-  cSingleRightSide(F0, F1),
-  cBCNF(R0, F1, Rho0),
-  list_of_atom_to_list(Rho, Rho0).
-
 % bcnfs(abcde, [ab->cd, b->e, d->e], Rhos).
 % bcnf(itkoscmpd, [it->k, t->oscm, cm->pd, p->c], Rhos).
 
@@ -101,11 +104,19 @@ bcnf(R, F, Rho) :-
 decomposition_to_text(L, L0) :-
   atomic_list_concat(L, ', ', L0).
 
-% decomposition to 3NF schemes
-d3nf(R, F, Rho) :-
+% ==================== prodecures that return multiple answers ====================
+% naming convention:
+%  - proc: produces one answer, can backtrack (e.g. by hitting the ; key on the console)
+%  - procs_all: produces all answers in a list
+%  - procs: produces all answers in multiline text format
+
+% ========= BCNF ==========
+% decomposition to BCNF schemes
+bcnf(R, F, Rho) :-
   atom_to_list(R, R0),
   canonicalFDs(F, F0),
-  c3NF(R0, F0, Rho0),
+  cSingleRightSide(F0, F1),
+  cBCNF(R0, F1, Rho0),
   list_of_atom_to_list(Rho, Rho0).
 
 % aggregate all BCNF decompositions
@@ -117,12 +128,34 @@ bcnfs(R, F, Rhos) :-
   map(Rhos0, fd:decomposition_to_text, Rhos1),
   atomic_list_concat(Rhos1, '~n', Rhos).
 
+% ========== 3NF ==========
+% decomposition to 3NF schemes
+d3nf(R, F, Rho) :-
+  atom_to_list(R, R0),
+  canonicalFDs(F, F0),
+  c3NF(R0, F0, Rho0),
+  list_of_atom_to_list(Rho, Rho0).
+
 % aggregate all 3NF decompositons
 d3nfs_all(R, F, Rhos) :-
   findall(Rho, d3nf(R, F, Rho), Rhos).
 
+% format 3NF decompositions
 d3nfs(R, F, Rhos) :-
   call_with_time_limit(1, d3nfs_all(R, F, Rhos0)),
   map(Rhos0, fd:decomposition_to_text, Rhos1),
   atomic_list_concat(Rhos1, '~n', Rhos).
 
+% ========= FMin ==========
+fmin(F, Fmin) :-
+  canonicalFDs(F, F0),
+  cFmin(F0, F1),
+  prettyFDs(F1, Fmin).
+
+fmins_all(F, FMins) :-
+  findall(FMin, fmin(F, FMin), FMins).
+
+fmins(F, FMins) :-
+  call_with_time_limit(1, fmins_all(F, FMins0)),
+  map(FMins0, fd_parser:fds_to_string, FMins1),
+  atomic_list_concat(FMins1, '~n', FMins).

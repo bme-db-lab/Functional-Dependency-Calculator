@@ -74,9 +74,8 @@ httpFMin(Request) :-
         f(F, [])
       ]),
     parse_fds(F, F0),
-    fmin(F0, FMin),
-    fds_to_string(FMin, FMinS),
-    reply(FMinS).
+    fmins(F0, FMins),
+    reply(FMins).
 
 % keys
 httpKeys(Request) :-
@@ -99,7 +98,7 @@ httpPrimaryAttributes(Request) :-
       ]),
     parse_fds(F, F0),
     primaryattributes(R, F0, PrimaryAttributes),
-    null_to_empty(PrimaryAttributes, PrimaryAttributes0),
+    null_to_empfty(PrimaryAttributes, PrimaryAttributes0),
     reply(PrimaryAttributes0).
 
 % secondary attributes
