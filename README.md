@@ -13,7 +13,7 @@ Given a relational scheme and a set of functional dependencies the program can
 Compatible and tested with SWI-Prolog (http://www.swi-prolog.org/).
 
 Architecture
--------------
+------------
 ```
 ┌───────────────────────┐   ┌────────────────────────┐
 │ web frontend          │   │  Prolog console        │
