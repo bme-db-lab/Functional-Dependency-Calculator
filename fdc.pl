@@ -233,7 +233,6 @@ cBCNF(S, G, Rho) :-
   \+ bcnfdecomposition(Rho),
   assert(bcnfdecomposition(Rho)).
 
-
 % decompose to BCNF
 cDecomposeToBCNF(S, G, Rho) :-  
   findall(XA, (member(XA, G), cSatisfiesBCNF(S, G, XA)), SatisfyingBCNF),
@@ -244,8 +243,10 @@ cDecomposeToBCNF(S, G, Rho) :-
       subtract(S, [A], S2),
       cProjectFDs(G, S1, G1),
       cProjectFDs(G, S2, G2),
-      cDecomposeToBCNF(S1, G1, Rho1),
-      cDecomposeToBCNF(S2, G2, Rho2),
+      sort(S1, S10),
+      sort(S2, S20),
+      cDecomposeToBCNF(S10, G1, Rho1),
+      cDecomposeToBCNF(S20, G2, Rho2),
       append(Rho1, Rho2, Rho)
     )
   ; ViolatingBCNF = [], Rho = [S]

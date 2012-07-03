@@ -1,4 +1,5 @@
 :- module(sets, [powerSet/2, subtract/3, union/3, union/2, subset/2]).
+
 % from the Erlang equivalent in http://dp.iit.bme.hu/dp-current/dp11a-minden-p1.pdf
 insAll(_, [], Zss, Zss).
 insAll(X, [Ys|Yss], Zss, Xss) :-
@@ -7,7 +8,10 @@ insAll(X, [Ys|Yss], Zss, Xss) :-
 powerSet([], [[]]).
 powerSet([X|Xs], PS) :-
   powerSet(Xs, P),
-  insAll(X, P, P, PS).
+  insAll(X, P, P, PS), !.
+  % we need the cut (!) because only one solution is possible
+  % -> Prolog should not backtrack
+  % (the procedure is translated from an Erlang function and Erlang does not backtrack)
   
 % from SWI-Prolog's lists.pl
 subtract([], _, []) :- !.

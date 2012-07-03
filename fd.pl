@@ -17,7 +17,7 @@ atom_to_list(A, L) :-
   ; atom_chars(A, L)
   ).
 
-list_of_atom_to_list([], []).
+list_of_atom_to_list([], []) :- !.
 list_of_atom_to_list([A|As], [L|Ls]) :-
   atom_to_list(A, L),
   list_of_atom_to_list(As, Ls).
