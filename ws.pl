@@ -15,11 +15,15 @@
 :- http_handler(root(bcnfs), httpBCNFs, []).
 :- http_handler(root(d3nfs), http3NFs, []).
 
+port(5000).
+
 start :-
-    server(5000).
+    port(Port),
+    server(Port).
 
 stop :-
-    http_stop_server(5000, []).
+    port(Port),
+    http_stop_server(Port, []).
 
 restart :-
     stop, [ws], start.

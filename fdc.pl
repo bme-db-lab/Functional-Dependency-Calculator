@@ -47,7 +47,7 @@ cSuperkey(R, F, X) :-
 cTrivial(X->A) :-
   memberchk(A, X).
 
-% S is the superkeys of scheme R with FDs F
+% S is the superkeys of schema R with FDs F
 cSuperKeys(R, F, S) :-
   powerSet(R, Hatv),
   findall(X, (member(X, Hatv), cSuperkey(R, F, X)), S).
@@ -265,14 +265,14 @@ cDecomposeTo3NF(S, G, Rho) :-
   cKeys(S, G0, Keys),                       % determine the keys
   member(Key, Keys),                        % pick a key
   cFmin(G, GMin),                           % determine a possible minimal FD set
-  map(GMin, fdc:cDependencyToScheme, Rho0), % convert the minimal FD set to relational schemes
+  map(GMin, fdc:cDependencyToSchema, Rho0), % convert the minimal FD set to relational schemas
   ( hasSuperSet(Rho0, Key) -> Rho = Rho0    % it contains the key, there is no need to add 
   ; union(Rho0, [Key], Rho1), sort(Rho1, Rho)
   ).
 
-% converts a (canonical) minimal FD to relational scheme,
+% converts a (canonical) minimal FD to relational schema,
 % e.g. [a, b]->e becomes [a, b, e]
-cDependencyToScheme(X->Y, R) :-
+cDependencyToSchema(X->Y, R) :-
   union(X, [Y], R0),
   sort(R0, R).
 

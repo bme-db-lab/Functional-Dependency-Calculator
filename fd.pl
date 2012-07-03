@@ -5,6 +5,9 @@
 :- use_module(library(time)).
 :- use_module(fd_parser).
 
+% predicate for timeout constant (in seconds)
+timeout(1).
+
 % convert atom to list of one-character atoms and backwards
 % myatom <---> [m, y, a, t, o, m]
 %    [a] ----> a
@@ -74,35 +77,20 @@ secondaryattributes(R, F, SecondaryAttributes) :-
   canonicalFDs(F, F0),
   cSingleRightSide(F0, F1),
   cSecondaryAttributes(R0, F1, SecondaryAttributes0),
-  sort(SecondaryAttr
-% ========= FMin ==========
-fmin(F, Fmin) :-
-  canonicalFDs(F, F0),
-  cFmin(F0, F1),
-  prettyFDs(F1, Fmin).
-
-fmin_all(F, FMins) :-
-  findall(FMin, fmin(F, FMin), FMins).
-
-fmins(F, FMins) :-
-  call_with_time_limit(1, fmins_all(F, FMins0)),
-  map(FMins0, fd_parser:fds_to_string, FMins1),
-  atomic_list_concat(FMins1, '~n', FMins).ibutes0, SecondaryAttributes1),
+  sort(SecondaryAttributes0, SecondaryAttributes1),
   atom_to_list(SecondaryAttributes, SecondaryAttributes1).
 
+% convert a schema decomposition (set of atoms) to readable text
+decomposition_to_text(L, L0) :-
+  atomic_list_concat(L, ', ', L0).
+
+% calculate the closure of a set
 fclose(R, F, FClosed) :-
   atom_to_list(R, R0),
   canonicalFDs(F, F0),
   cSingleRightSide(F0, F1),
   cFclose(R0, F1, FClosed0),
   prettyFDs(FClosed0, FClosed).
-
-% bcnfs(abcde, [ab->cd, b->e, d->e], Rhos).
-% bcnf(itkoscmpd, [it->k, t->oscm, cm->pd, p->c], Rhos).
-
-% convert a scheme decomposition (set of atoms) to readable text
-decomposition_to_text(L, L0) :-
-  atomic_list_concat(L, ', ', L0).
 
 % ==================== prodecures that return multiple answers ====================
 % naming convention:
@@ -111,7 +99,7 @@ decomposition_to_text(L, L0) :-
 %  - procs: produces all answers in multiline text format
 
 % ========= BCNF ==========
-% decomposition to BCNF schemes
+% decomposition to BCNF schemas
 bcnf(R, F, Rho) :-
   atom_to_list(R, R0),
   canonicalFDs(F, F0),
@@ -129,7 +117,7 @@ bcnfs(R, F, Rhos) :-
   atomic_list_concat(Rhos1, '~n', Rhos).
 
 % ========== 3NF ==========
-% decomposition to 3NF schemes
+% decomposition to 3NF schemas
 d3nf(R, F, Rho) :-
   atom_to_list(R, R0),
   canonicalFDs(F, F0),
@@ -142,7 +130,8 @@ d3nfs_all(R, F, Rhos) :-
 
 % format 3NF decompositions
 d3nfs(R, F, Rhos) :-
-  call_with_time_limit(1, d3nfs_all(R, F, Rhos0)),
+  timeout(T),
+  call_with_time_limit(T, d3nfs_all(R, F, Rhos0)),
   map(Rhos0, fd:decomposition_to_text, Rhos1),
   atomic_list_concat(Rhos1, '~n', Rhos).
 
@@ -156,6 +145,8 @@ fmins_all(F, FMins) :-
   findall(FMin, fmin(F, FMin), FMins).
 
 fmins(F, FMins) :-
-  call_with_time_limit(1, fmins_all(F, FMins0)),
+  timeout(T),
+  call_with_time_limit(T, fmins_all(F, FMins0)),
   map(FMins0, fd_parser:fds_to_string, FMins1),
   atomic_list_concat(FMins1, '~n', FMins).
+
