@@ -107,14 +107,13 @@ bcnf(R, F, Rho) :-
   cBCNF(R0, F1, Rho0),
   list_of_atom_to_list(Rho, Rho0).
 
-% aggregate all BCNF decompositions
+% list all BCNF decompositions
 bcnfs_all(R, F, Rhos) :-
   findall(Rho, bcnf(R, F, Rho), Rhos).
 
+% list all BCNF decompositions with timeout
 bcnfs(R, F, Rhos) :-
-  call_with_time_limit(1, bcnfs_all(R, F, Rhos0)),
-  map(Rhos0, fd:decomposition_to_text, Rhos1),
-  atomic_list_concat(Rhos1, '~n', Rhos).
+  call_with_timeout(R, F, Rhos, bcnfs_all, bcnf, fd:decomposition_to_text).
 
 % ========== 3NF ==========
 % decomposition to 3NF schemas
@@ -130,10 +129,7 @@ d3nfs_all(R, F, Rhos) :-
 
 % format 3NF decompositions
 d3nfs(R, F, Rhos) :-
-  timeout(T),
-  call_with_time_limit(T, d3nfs_all(R, F, Rhos0)),
-  map(Rhos0, fd:decomposition_to_text, Rhos1),
-  atomic_list_concat(Rhos1, '~n', Rhos).
+  call_with_timeout(R, F, Rhos, d3nfs_all, d3nf, fd:decomposition_to_text).
 
 % ========= FMin ==========
 fmin(F, Fmin) :-
@@ -145,8 +141,50 @@ fmins_all(F, FMins) :-
   findall(FMin, fmin(F, FMin), FMins).
 
 fmins(F, FMins) :-
-  timeout(T),
-  call_with_time_limit(T, fmins_all(F, FMins0)),
-  map(FMins0, fd_parser:fds_to_string, FMins1),
-  atomic_list_concat(FMins1, '~n', FMins).
+  call_with_timeout(F, FMins, fmins_all, fmin, fd_parser:fds_to_string).
 
+% ========== timeout ==========
+% call decomposition with timeout
+
+% call functions with one argument
+call_with_timeout(A, Solution, PredNormal, PredTimeout, PredMapping) :-
+  timeout(T),  
+  catch(
+    call_with_time_limit(
+      T,
+      (call(PredNormal, A, Solution1), HadTimeout = false
+      )
+    ),
+    time_limit_exceeded,
+    (
+      HadTimeout = true,
+      (call(PredTimeout, A, Solution0)),
+      Solution1 = [Solution0]
+    )
+  ),
+  map(Solution1, PredMapping, Solution2),
+  atomic_list_concat(Solution2, '~n', Solution3),
+  ( HadTimeout = true -> string_concat('<timeout, only listing the first solution>~n', Solution3, Solution), !
+  ; Solution = Solution3
+  ).
+
+% call functions with two arguments
+call_with_timeout(A, B, Solution, PredNormal, PredTimeout, PredMapping) :-
+  timeout(T),  
+  catch(
+    call_with_time_limit(
+      T,
+      (call(PredNormal, A, B, Solution1), HadTimeout = false)
+    ),
+    time_limit_exceeded,
+    (
+      HadTimeout = true,
+      (call(PredTimeout, A, B, Solution0)),
+      Solution1 = [Solution0]
+    )
+  ),
+  map(Solution1, PredMapping, Solution2),
+  atomic_list_concat(Solution2, '~n', Solution3),
+  ( HadTimeout = true -> string_concat('<timeout, only listing the first solution>~n', Solution3, Solution), !
+  ; Solution = Solution3
+  ).

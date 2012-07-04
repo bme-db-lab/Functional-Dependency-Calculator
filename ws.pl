@@ -10,8 +10,8 @@
 :- http_handler(root(nf), httpNF, []).
 :- http_handler(root(fmin), httpFMin, []).
 :- http_handler(root(keys), httpKeys, []).
-:- http_handler(root(primaryattributes), httpPrimaryAttributes, []).
-:- http_handler(root(secondaryattributes), httpSecondaryAttributes, []).
+:- http_handler(root(primary), httpPrimaryAttributes, []).
+:- http_handler(root(secondary), httpSecondaryAttributes, []).
 :- http_handler(root(bcnfs), httpBCNFs, []).
 :- http_handler(root(d3nfs), http3NFs, []).
 
@@ -52,9 +52,10 @@ httpRoot(_) :-
     format('    <li><a href="nf?r=abcdef&f=a->b,b->c,c->a,d->e,e->f,f->d">nf</a></li>~n'),
     format('    <li><a href="fmin?f=a->b,b->d,a->d">fmin</a></li>~n'),
     format('    <li><a href="keys?r=abcdef&f=a->b,b->c">keys</a></li>~n'),
-    format('    <li><a href="primaryattributes?r=abcdef&f=a->b,b->c">primaryattributes</a></li>~n'),
-    format('    <li><a href="secondaryattributes?r=abcdef&f=a->b,b->c">secondaryattributes</a></li>~n'),
-    format('    <li><a href="bcnfs?r=abcde&f=ab->cd, b->e, d->e">bcnf</a></li>~n'),
+    format('    <li><a href="primary?r=abcdef&f=a->b,b->c">primaryattributes</a></li>~n'),
+    format('    <li><a href="secondary?r=abcdef&f=a->b,b->c">secondaryattributes</a></li>~n'),
+    format('    <li><a href="bcnfs?r=itkoscmpd&f=it->os">bcnf</a></li>~n'),
+    format('    <li><a href="bcnfs?r=abcde&f=ab->cd, b->e, d->e">bcnf timout</a></li>~n'),
     format('    <li><a href="d3nfs?r=abcde&f=ab->cd, b->e, d->e">d3nfs</a></li>~n'),
     format('  </ul>~n'),
     format('</body>~n'),
@@ -102,7 +103,7 @@ httpPrimaryAttributes(Request) :-
       ]),
     parse_fds(F, F0),
     primaryattributes(R, F0, PrimaryAttributes),
-    null_to_empfty(PrimaryAttributes, PrimaryAttributes0),
+    null_to_empty(PrimaryAttributes, PrimaryAttributes0),
     reply(PrimaryAttributes0).
 
 % secondary attributes
