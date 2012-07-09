@@ -55,7 +55,7 @@ httpRoot(_) :-
     format('    <li><a href="primary?r=abcdef&f=a->b,b->c">primaryattributes</a></li>~n'),
     format('    <li><a href="secondary?r=abcdef&f=a->b,b->c">secondaryattributes</a></li>~n'),
     format('    <li><a href="bcnfs?r=itkoscmpd&f=it->os">bcnf</a></li>~n'),
-    format('    <li><a href="bcnfs?r=abcde&f=ab->cd, b->e, d->e">bcnf timout</a></li>~n'),
+    format('    <li><a href="bcnfs?r=abcde&f=ab->cd, b->e, d->e">bcnf timeout</a></li>~n'),
     format('    <li><a href="d3nfs?r=abcde&f=ab->cd, b->e, d->e">d3nfs</a></li>~n'),
     format('  </ul>~n'),
     format('</body>~n'),

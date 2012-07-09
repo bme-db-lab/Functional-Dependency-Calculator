@@ -6,7 +6,7 @@
 :- use_module(fd_parser).
 
 % predicate for timeout constant (in seconds)
-timeout(1).
+timeout(100).
 
 % convert atom to list of one-character atoms and backwards
 % myatom <---> [m, y, a, t, o, m]
