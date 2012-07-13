@@ -6,7 +6,7 @@
 :- use_module(fd_parser).
 :- use_module(fd).
 
-:- http_handler(root(.), httpRoot, []).
+:- http_handler(root(.), http_reply_file('index.html', []), []).
 :- http_handler(root(nf), httpNF, []).
 :- http_handler(root(fmin), httpFMin, []).
 :- http_handler(root(keys), httpKeys, []).
@@ -37,29 +37,6 @@ null_to_empty(PrimaryAttributes, PrimaryAttributes).
 reply(Text) :-
     format('Content-type: text/plain~n~n'),
     format(Text).
-
-httpRoot(_) :-
-    format('Content-type: text/html~n~n'),
-    format('<!DOCTYPE html>~n'),
-    format('<html>~n'),
-    format('<head>~n'),
-    format('  <title>Functional Dependency Calculator Web Service</title>~n'),
-    format('</head>~n'),
-    format('<body>~n'),
-    format('  <h1>Functional Dependency Calculator Web Service</h1>~n'),
-    format('  <div>Examples:</div>~n'),
-    format('  <ul>~n'),
-    format('    <li><a href="nf?r=abcdef&f=a->b,b->c,c->a,d->e,e->f,f->d">nf</a></li>~n'),
-    format('    <li><a href="fmin?f=a->b,b->d,a->d">fmin</a></li>~n'),
-    format('    <li><a href="keys?r=abcdef&f=a->b,b->c">keys</a></li>~n'),
-    format('    <li><a href="primary?r=abcdef&f=a->b,b->c">primaryattributes</a></li>~n'),
-    format('    <li><a href="secondary?r=abcdef&f=a->b,b->c">secondaryattributes</a></li>~n'),
-    format('    <li><a href="bcnfs?r=itkoscmpd&f=it->os">bcnf</a></li>~n'),
-    format('    <li><a href="bcnfs?r=abcde&f=ab->cd, b->e, d->e">bcnf timeout</a></li>~n'),
-    format('    <li><a href="d3nfs?r=abcde&f=ab->cd, b->e, d->e">d3nfs</a></li>~n'),
-    format('  </ul>~n'),
-    format('</body>~n'),
-    format('</html>~n').
 
 % nf
 httpNF(Request) :-

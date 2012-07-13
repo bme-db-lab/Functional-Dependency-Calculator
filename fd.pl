@@ -10,7 +10,7 @@ timeout(1).
 
 % convert atom to list of one-character atoms and backwards
 % myatom <---> [m, y, a, t, o, m]
-%    [a] ----> a
+%    [a] ----> add
 %     a  <---- a
 atom_to_list(A, L) :- 
   ( atom(L) -> A = L

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Functional Dependency Calculator Web Service</title>
+</head>
+<body>
+  <h1>Functional Dependency Calculator Web Service</h1>
+  <div>Examples:</div>
+  <ul>
+    <li><a href="nf?r=abcdef&f=a->b,b->c,c->a,d->e,e->f,f->d">nf</a></li>
+    <li><a href="fmin?f=a->b,b->d,a->d">fmin</a></li>
+    <li><a href="keys?r=abcdef&f=a->b,b->c">keys</a></li>
+    <li><a href="primary?r=abcdef&f=a->b,b->c">primaryattributes</a></li>
+    <li><a href="secondary?r=abcdef&f=a->b,b->c">secondaryattributes</a></li>
+    <li><a href="bcnfs?r=itkoscmpd&f=it->os">bcnf</a></li>
+    <li><a href="bcnfs?r=abcde&f=ab->cd, b->e, d->e">bcnf timeout</a></li>
+    <li><a href="d3nfs?r=abcde&f=ab->cd, b->e, d->e">d3nfs</a></li>
+  </ul>
+
+  <div id="form_wrapper">
+      <form action="" id="demoForm" method="get">
+          <fieldset>
+              <legend>Functional Dependency Calculator</legend>
+              <p>
+                  <label for="r">relational schema:</label>
+                  <input type="text" name="r" id="r" value="abcd" />
+              </p>
+              <p>
+                  <label for="f">functional dependency set:</label>
+                  <input type="text" name="f" id="f" value="a->bc, c->d" />
+              </p>
+              <p>
+                  <input type="submit" name="submit" id="submit" value="Submit" />
+              </p>
+          </fieldset>
+      </form>
+  </div>
+
+  <div id="result">
+      <div>nf: <span id="nf"></span></div>
+      <div>fmin: <span id="fmin"></span></div>
+      <div>keys: <span id="keys"></span></div>
+      <div>primary: <span id="primary"></span></div>
+      <div>secondary: <span id="secondary"></span></div>
+  </div>
+
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $('#submit').click(function() {
+
+        var rString = 'r=' + $('#r').val();
+        var fString = 'f=' + $('#f').val();
+
+        $.ajax({
+          type : 'GET',
+          url : 'nf?' + rString + '&' + fString,
+          success : function(text) { $('#nf').html(text); }
+        });
+
+        $.ajax({
+          type : 'GET',
+          url : 'fmin?' + fString,
+          success : function(text) { $('#fmin').html(text);  }
+        });
+
+        $.ajax({
+          type : 'GET',
+          url : 'keys?' + rString + '&' + fString,
+          success : function(text) { $('#keys').html(text); }
+        });
+
+        $.ajax({
+          type : 'GET',
+          url : 'primary?' + rString + '&' + fString,
+          success : function(text) { $('#primary').html(text); }
+        });
+
+        $.ajax({
+          type : 'GET',
+          url : 'secondary?' + rString + '&' + fString,
+          success : function(text) { $('#secondary').html(text); }
+        });
+
+        return false;
+      });
+    });
+  </script>
+
+</body>
+</html>
