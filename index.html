@@ -2,50 +2,15 @@
 <html>
 <head>
   <title>Functional Dependency Calculator Web Service</title>
-</head>
-<body>
-  <h1>Functional Dependency Calculator Web Service</h1>
-  <div>Examples:</div>
-  <ul>
-    <li><a href="nf?r=abcdef&f=a->b,b->c,c->a,d->e,e->f,f->d">nf</a></li>
-    <li><a href="fmin?f=a->b,b->d,a->d">fmin</a></li>
-    <li><a href="keys?r=abcdef&f=a->b,b->c">keys</a></li>
-    <li><a href="primary?r=abcdef&f=a->b,b->c">primaryattributes</a></li>
-    <li><a href="secondary?r=abcdef&f=a->b,b->c">secondaryattributes</a></li>
-    <li><a href="bcnfs?r=itkoscmpd&f=it->os">bcnf</a></li>
-    <li><a href="bcnfs?r=abcde&f=ab->cd, b->e, d->e">bcnf timeout</a></li>
-    <li><a href="d3nfs?r=abcde&f=ab->cd, b->e, d->e">d3nfs</a></li>
-  </ul>
-
-  <div id="form_wrapper">
-      <form action="" id="demoForm" method="get">
-          <fieldset>
-              <legend>Functional Dependency Calculator</legend>
-              <p>
-                  <label for="r">relational schema:</label>
-                  <input type="text" name="r" id="r" value="abcd" />
-              </p>
-              <p>
-                  <label for="f">functional dependency set:</label>
-                  <input type="text" name="f" id="f" value="a->bc, c->d" />
-              </p>
-              <p>
-                  <input type="submit" name="submit" id="submit" value="Submit" />
-              </p>
-          </fieldset>
-      </form>
-  </div>
-
-  <div id="result">
-      <div>nf: <span id="nf"></span></div>
-      <div>fmin: <span id="fmin"></span></div>
-      <div>keys: <span id="keys"></span></div>
-      <div>primary: <span id="primary"></span></div>
-      <div>secondary: <span id="secondary"></span></div>
-  </div>
+  <link href="//current.bootstrapcdn.com/bootstrap-v204/css/bootstrap-combined.min.css" rel="stylesheet">
 
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script type="text/javascript">
+    function nl2br(input_string)
+    {
+      return input_string.replace(/(\r\n|\r|\n)/g, '<br>');
+    }
+
     $(document).ready(function(){
       $('#submit').click(function() {
 
@@ -82,10 +47,78 @@
           success : function(text) { $('#secondary').html(text); }
         });
 
+        $.ajax({
+          type : 'GET',
+          url : 'bcnfs?' + rString + '&' + fString,
+          success : function(text) { $('#bcnfs').html(nl2br(text)); }
+        });
+
+        $.ajax({
+          type : 'GET',
+          url : 'd3nfs?' + rString + '&' + fString,
+          success : function(text) { $('#d3nfs').html(text); }
+        });
+
         return false;
       });
     });
   </script>
 
+</head>
+
+<body>
+  <h1>Functional Dependency Calculator Web Service</h1>
+  <h2>AJAX form</h2>
+  <div id="form_wrapper">
+      <form action="" id="demoForm" method="get">
+          <fieldset>
+              <legend>Input</legend>
+              <div>
+                  <label for="r">relational schema:</label>
+                  <input type="text" name="r" id="r" value="abcde" />
+              </div>
+              <div>
+                  <label for="f">functional dependency set:</label>
+                  <input type="text" name="f" id="f" value="ab->cd, b->e, d->e" />
+              </div>
+              <div>
+                  <input type="submit" name="submit" id="submit" value="Submit" />
+              </div>
+          </fieldset>
+
+          <fieldset>
+              <legend>Results</legend>
+              <table border="1" cellspacing="0" cellpadding="3">
+                  <tr><td>normal form</td><td id="nf"></td></tr>
+                  <tr><td>fmin</td><td id="fmin"></td></tr>
+                  <tr><td>keys</td><td id="keys"></td></tr>
+                  <tr><td>primary attributes</td><td id="primary"></td></tr>
+                  <tr><td>secondary attributes</td><td id="secondary"></td></tr>
+                  <tr>
+                    <td>BCNF decompositions</td>
+                    <td id="bcnfs"></td>
+                  </tr>
+                  </tr>
+                  <tr>
+                    <td>3NF decompositions</td>
+                    <td id="d3nfs"></td>
+                  </tr>
+              </table>
+          </fieldset>
+
+      </form>
+  </div>
+
+  <h2>HTTP examples</h2>
+  <ul>
+    <li><a href="nf?r=abcdef&f=a->b,b->c,c->a,d->e,e->f,f->d">nf</a></li>
+    <li><a href="fmin?f=a->b,b->d,a->d">fmin</a></li>
+    <li><a href="keys?r=abcdef&f=a->b,b->c">keys</a></li>
+    <li><a href="primary?r=abcdef&f=a->b,b->c">primaryattributes</a></li>
+    <li><a href="secondary?r=abcdef&f=a->b,b->c">secondaryattributes</a></li>
+    <li><a href="bcnfs?r=abcde&f=ab->cd, b->e, d->e">bcnf</a></li>
+    <li><a href="bcnfs?r=itkoscmpd&f=it->os">bcnf timeout</a></li>
+    <li><a href="d3nfs?r=abcde&f=ab->cd, b->e, d->e">d3nfs</a></li>
+  </ul>
 </body>
 </html>

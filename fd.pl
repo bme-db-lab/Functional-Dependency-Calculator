@@ -164,7 +164,7 @@ call_with_timeout(A, Solution, PredNormal, PredTimeout, PredMapping) :-
   ),
   map(Solution1, PredMapping, Solution2),
   atomic_list_concat(Solution2, '~n', Solution3),
-  ( HadTimeout = true -> string_concat('<timeout, only listing the first solution>~n', Solution3, Solution), !
+  ( HadTimeout = true -> string_concat('[timeout, only listing the first solution]~n', Solution3, Solution), !
   ; Solution = Solution3
   ).
 
@@ -185,6 +185,6 @@ call_with_timeout(A, B, Solution, PredNormal, PredTimeout, PredMapping) :-
   ),
   map(Solution1, PredMapping, Solution2),
   atomic_list_concat(Solution2, '~n', Solution3),
-  ( HadTimeout = true -> string_concat('<timeout, only listing the first solution>~n', Solution3, Solution), !
+  ( HadTimeout = true -> string_concat('[timeout, only listing the first solution]~n', Solution3, Solution), !
   ; Solution = Solution3
   ).
