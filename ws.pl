@@ -20,6 +20,7 @@
        d3nf,
        bcnf
      ).
+:- json_object error(message).
 
 :- http_handler(root(.),                   httpIndex,                      []).
 :- http_handler(root(nf),                  httpNFTimeout,                  []).
@@ -29,7 +30,7 @@
 :- http_handler(root(fmin),                httpFMinTimeout,                []).
 :- http_handler(root(bcnfs),               httpBCNFsTimeout,               []).
 :- http_handler(root(d3nfs),               http3NFsTimeout,                []).
-:- http_handler(root(json),                httpJSON,                       []).
+:- http_handler(root(json),                httpJSONTimeout,                []).
 
 httpIndex(Request)                      :- http_reply_file('index.html', [], Request).
 httpNFTimeout(Request)                  :- reply_with_timeout(Request, httpNF).
@@ -154,6 +155,14 @@ http3NFs(Request, Reply) :-
 % list all 3NF decompositions with timeout
 d3nfs(R, F, Rhos) :-
   call_with_timeout(R, F, Rhos, d3nfs_all, d3nf, fd:decomposition_to_text).
+
+httpJSONTimeout(Request) :-
+  timeout(T),
+  catch(
+    call_with_time_limit(T, httpJSON(Request)),
+    time_limit_exceeded, % exception type
+    reply('timeout') % catch branch
+  ).
 
 httpJSON(Request) :-
   http_parameters(Request,
