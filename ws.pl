@@ -167,7 +167,7 @@ httpJSON(Request) :-
   primaryattributes(R, F0, PrimaryAttributes),
   secondaryattributes(R, F0, SecondaryAttributes),
   fmins(F0, FMins),
-  bcnfs(R, F0, BCNFs),
   d3nfs(R, F0, D3NFs),
-  prolog_to_json(analysis(N, Keys, PrimaryAttributes, SecondaryAttributes, FMins, BCNFs, D3NFs), Result),
+  bcnfs(R, F0, BCNFs),
+  prolog_to_json(analysis(N, Keys, PrimaryAttributes, SecondaryAttributes, FMins, D3NFs, BCNFs), Result),
   reply_json(Result).
