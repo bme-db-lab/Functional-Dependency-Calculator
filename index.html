@@ -26,7 +26,7 @@
         $.ajax({
           type : 'GET',
           url : 'fmin?' + fString,
-          success : function(text) { $('#fmin').html(text);  }
+          success : function(text) { $('#fmin').html(nl2br(text));  }
         });
 
         $.ajax({
@@ -56,7 +56,7 @@
         $.ajax({
           type : 'GET',
           url : 'd3nfs?' + rString + '&' + fString,
-          success : function(text) { $('#d3nfs').html(text); }
+          success : function(text) { $('#d3nfs').html(nl2br(text)); }
         });
 
         return false;
