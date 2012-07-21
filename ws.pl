@@ -5,16 +5,28 @@
 :- use_module(library(uri)).
 :- use_module(fd_parser).
 :- use_module(fd).
+:- use_module(functional).
+:- use_module(timeout).
 
-:- http_handler(root(.), http_reply_file('index.html', []), []).
-:- http_handler(root(nf), httpNF, []).
-:- http_handler(root(fmin), httpFMin, []).
-:- http_handler(root(keys), httpKeys, []).
-:- http_handler(root(primary), httpPrimaryAttributes, []).
-:- http_handler(root(secondary), httpSecondaryAttributes, []).
-:- http_handler(root(bcnfs), httpBCNFs, []).
-:- http_handler(root(d3nfs), http3NFs, []).
+:- http_handler(root(.),         httpIndex,                      []).
+:- http_handler(root(nf),        httpNFTimeout,                  []).
+:- http_handler(root(keys),      httpKeysTimeout,                []).
+:- http_handler(root(primary),   httpPrimaryAttributesTimeout,   []).
+:- http_handler(root(secondary), httpSecondaryAttributesTimeout, []).
+:- http_handler(root(fmin),      httpFMinTimeout,                []).
+:- http_handler(root(bcnfs),     httpBCNFsTimeout,               []).
+:- http_handler(root(d3nfs),     http3NFsTimeout,                []).
 
+httpIndex(Request)                      :- http_reply_file('index.html', [], Request).
+httpNFTimeout(Request)                  :- reply_with_timeout(Request, httpNF).
+httpKeysTimeout(Request)                :- reply_with_timeout(Request, httpKeys).
+httpPrimaryAttributesTimeout(Request)   :- reply_with_timeout(Request, httpPrimaryAttributes).
+httpSecondaryAttributesTimeout(Request) :- reply_with_timeout(Request, httpSecondaryAttributes).
+httpFMinTimeout(Request)                :- reply_with_timeout(Request, httpFMin).
+httpBCNFsTimeout(Request)               :- reply_with_timeout(Request, httpBCNFs).
+http3NFsTimeout(Request)                :- reply_with_timeout(Request, http3NFs).
+
+% port number
 port(5000).
 
 start :-
@@ -39,7 +51,7 @@ reply(Text) :-
     format(Text).
 
 % nf
-httpNF(Request) :-
+httpNF(Request, Reply) :-
     http_parameters(Request,
       [
         r(R, []),
@@ -47,20 +59,24 @@ httpNF(Request) :-
       ]),
     parse_fds(F, F0),
     nf(R, F0, N),
-    reply(N).
+    Reply = N.
 
 % fmin
-httpFMin(Request) :-
+httpFMin(Request, Reply) :-
     http_parameters(Request,
       [
         f(F, [])
       ]),
     parse_fds(F, F0),
     fmins(F0, FMins),
-    reply(FMins).
+    Reply = FMins.
+
+% list all fmins with timeout
+fmins(F, FMins) :-
+  call_with_timeout(F, FMins, fmins_all, fmin, fd_parser:fds_to_string).
 
 % keys
-httpKeys(Request) :-
+httpKeys(Request, Reply) :-
     http_parameters(Request,
       [
         r(R, []),
@@ -69,10 +85,10 @@ httpKeys(Request) :-
     parse_fds(F, F0),
     keys(R, F0, Keys),
     atomic_list_concat(Keys, ', ', S),
-    reply(S).
+    Reply = S.
 
 % primary attributes
-httpPrimaryAttributes(Request) :-
+httpPrimaryAttributes(Request, Reply) :-
     http_parameters(Request,
       [
         r(R, []),
@@ -81,10 +97,10 @@ httpPrimaryAttributes(Request) :-
     parse_fds(F, F0),
     primaryattributes(R, F0, PrimaryAttributes),
     null_to_empty(PrimaryAttributes, PrimaryAttributes0),
-    reply(PrimaryAttributes0).
+    Reply = PrimaryAttributes0.
 
 % secondary attributes
-httpSecondaryAttributes(Request) :-
+httpSecondaryAttributes(Request, Reply) :-
     http_parameters(Request,
       [
         r(R, []),
@@ -93,10 +109,10 @@ httpSecondaryAttributes(Request) :-
     parse_fds(F, F0),
     secondaryattributes(R, F0, SecondaryAttributes),
     null_to_empty(SecondaryAttributes, SecondaryAttributes0),
-    reply(SecondaryAttributes0).
+    Reply = SecondaryAttributes0.
 
 % BCNF decompositions
-httpBCNFs(Request) :-
+httpBCNFs(Request, Reply) :-
     http_parameters(Request,
       [
         r(R, []),
@@ -104,10 +120,14 @@ httpBCNFs(Request) :-
       ]),
     parse_fds(F, F0),
     bcnfs(R, F0, Rhos),
-    reply(Rhos).
+    Reply = Rhos.
+
+% list all BCNF decompositions with timeout
+bcnfs(R, F, Rhos) :-
+  call_with_timeout(R, F, Rhos, bcnfs_all, bcnf, fd:decomposition_to_text).
 
 % 3NF decompositions
-http3NFs(Request) :-
+http3NFs(Request, Reply) :-
     http_parameters(Request,
       [
         r(R, []),
@@ -115,5 +135,9 @@ http3NFs(Request) :-
       ]),
     parse_fds(F, F0),
     d3nfs(R, F0, Rhos),
-    reply(Rhos).
+    Reply = Rhos.
+
+% list all 3NF decompositions with timeout
+d3nfs(R, F, Rhos) :-
+  call_with_timeout(R, F, Rhos, d3nfs_all, d3nf, fd:decomposition_to_text).
 

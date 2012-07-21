@@ -1,12 +1,9 @@
-:- module(fd, [nf/3, fmin/2, fmins/2, fequiv/2, keys/3, primaryattributes/3, secondaryattributes/3, fclose/3, bcnf/3, bcnfs/3, d3nf/3, d3nfs/3]).
+:- module(fd, [nf/3, fmin/2, fmins_all/2, fequiv/2, keys/3, primaryattributes/3, secondaryattributes/3, fclose/3, bcnf/3, bcnfs_all/3, d3nf/3, d3nfs_all/3]).
 :- use_module(functional).
 :- use_module(fdc).
 :- use_module(library(lists)).
 :- use_module(library(time)).
 :- use_module(fd_parser).
-
-% predicate for timeout constant (in seconds)
-timeout(1).
 
 % convert atom to list of one-character atoms and backwards
 % myatom <---> [m, y, a, t, o, m]
@@ -111,10 +108,6 @@ bcnf(R, F, Rho) :-
 bcnfs_all(R, F, Rhos) :-
   findall(Rho, bcnf(R, F, Rho), Rhos).
 
-% list all BCNF decompositions with timeout
-bcnfs(R, F, Rhos) :-
-  call_with_timeout(R, F, Rhos, bcnfs_all, bcnf, fd:decomposition_to_text).
-
 % ========== 3NF ==========
 % decomposition to 3NF schemas
 d3nf(R, F, Rho) :-
@@ -127,10 +120,6 @@ d3nf(R, F, Rho) :-
 d3nfs_all(R, F, Rhos) :-
   findall(Rho, d3nf(R, F, Rho), Rhos).
 
-% format 3NF decompositions
-d3nfs(R, F, Rhos) :-
-  call_with_timeout(R, F, Rhos, d3nfs_all, d3nf, fd:decomposition_to_text).
-
 % ========= FMin ==========
 fmin(F, Fmin) :-
   canonicalFDs(F, F0),
@@ -140,51 +129,4 @@ fmin(F, Fmin) :-
 fmins_all(F, FMins) :-
   findall(FMin, fmin(F, FMin), FMins).
 
-fmins(F, FMins) :-
-  call_with_timeout(F, FMins, fmins_all, fmin, fd_parser:fds_to_string).
 
-% ========== timeout ==========
-% call decomposition with timeout
-
-% call functions with one argument
-call_with_timeout(A, Solution, PredNormal, PredTimeout, PredMapping) :-
-  timeout(T),  
-  catch(
-    call_with_time_limit(
-      T,
-      (call(PredNormal, A, Solution1), HadTimeout = false
-      )
-    ),
-    time_limit_exceeded,
-    (
-      HadTimeout = true,
-      (call(PredTimeout, A, Solution0)),
-      Solution1 = [Solution0]
-    )
-  ),
-  map(Solution1, PredMapping, Solution2),
-  atomic_list_concat(Solution2, '~n', Solution3),
-  ( HadTimeout = true -> string_concat('[timeout, only listing the first solution]~n', Solution3, Solution), !
-  ; Solution = Solution3
-  ).
-
-% call functions with two arguments
-call_with_timeout(A, B, Solution, PredNormal, PredTimeout, PredMapping) :-
-  timeout(T),  
-  catch(
-    call_with_time_limit(
-      T,
-      (call(PredNormal, A, B, Solution1), HadTimeout = false)
-    ),
-    time_limit_exceeded,
-    (
-      HadTimeout = true,
-      (call(PredTimeout, A, B, Solution0)),
-      Solution1 = [Solution0]
-    )
-  ),
-  map(Solution1, PredMapping, Solution2),
-  atomic_list_concat(Solution2, '~n', Solution3),
-  ( HadTimeout = true -> string_concat('[timeout, only listing the first solution]~n', Solution3, Solution), !
-  ; Solution = Solution3
-  ).
