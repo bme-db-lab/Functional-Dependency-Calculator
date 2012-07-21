@@ -37,14 +37,14 @@
 
         $.ajax({
           type : 'GET',
-          url : 'primary?' + rString + '&' + fString,
-          success : function(text) { $('#primary').html(text); }
+          url : 'primaryattributes?' + rString + '&' + fString,
+          success : function(text) { $('#primaryattributes').html(text); }
         });
 
         $.ajax({
           type : 'GET',
-          url : 'secondary?' + rString + '&' + fString,
-          success : function(text) { $('#secondary').html(text); }
+          url : 'secondaryattributes?' + rString + '&' + fString,
+          success : function(text) { $('#secondaryattributes').html(text); }
         });
 
         $.ajax({
@@ -92,8 +92,8 @@
                   <tr><td>normal form</td><td id="nf"></td></tr>
                   <tr><td>fmin</td><td id="fmin"></td></tr>
                   <tr><td>keys</td><td id="keys"></td></tr>
-                  <tr><td>primary attributes</td><td id="primary"></td></tr>
-                  <tr><td>secondary attributes</td><td id="secondary"></td></tr>
+                  <tr><td>primary attributes</td><td id="primaryattributes"></td></tr>
+                  <tr><td>secondary attributes</td><td id="secondaryattributes"></td></tr>
                   <tr>
                     <td>BCNF decompositions</td>
                     <td id="bcnfs"></td>
@@ -114,8 +114,8 @@
     <li><a href="nf?r=abcdef&f=a->b,b->c,c->a,d->e,e->f,f->d">nf</a></li>
     <li><a href="fmin?f=a->b,b->d,a->d">fmin</a></li>
     <li><a href="keys?r=abcdef&f=a->b,b->c">keys</a></li>
-    <li><a href="primary?r=abcdef&f=a->b,b->c">primaryattributes</a></li>
-    <li><a href="secondary?r=abcdef&f=a->b,b->c">secondaryattributes</a></li>
+    <li><a href="primaryattributes?r=abcdef&f=a->b,b->c">primaryattributes</a></li>
+    <li><a href="secondaryattributes?r=abcdef&f=a->b,b->c">secondaryattributes</a></li>
     <li><a href="bcnfs?r=abcde&f=ab->cd, b->e, d->e">bcnf</a></li>
     <li><a href="bcnfs?r=itkoscmpd&f=it->os">bcnf timeout</a></li>
     <li><a href="d3nfs?r=abcde&f=ab->cd, b->e, d->e">d3nfs</a></li>

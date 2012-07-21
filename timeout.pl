@@ -1,4 +1,5 @@
 :- module(timeout, [reply_with_timeout/2, call_with_timeout/5, call_with_timeout/6]).
+:- use_module(functional).
 
 % predicate for timeout constant (in seconds)
 timeout(1).
@@ -27,8 +28,8 @@ call_with_timeout(A, Solution, PredNormal, PredTimeout, PredMapping) :-
       (
         call(PredNormal, A, Solution0),
         map(Solution0, PredMapping, Solution1),
-        atomic_list_concat(Solution1, '~n', Solution2),
-        Solution = Solution2
+        %atomic_list_concat(Solution1, '~n', Solution2),
+        Solution = Solution1
       )
     ),
     time_limit_exceeded, % exception type
@@ -56,8 +57,8 @@ call_with_timeout(A, B, Solution, PredNormal, PredTimeout, PredMapping) :-
       (
         call(PredNormal, A, B, Solution0),
         map(Solution0, PredMapping, Solution1),
-        atomic_list_concat(Solution1, '~n', Solution2),
-        Solution = Solution2
+        %atomic_list_concat(Solution1, '~n', Solution2),
+        Solution = Solution1
       )
     ),
     time_limit_exceeded, % exception type

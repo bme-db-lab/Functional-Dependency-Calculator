@@ -5,17 +5,31 @@
 :- use_module(library(uri)).
 :- use_module(fd_parser).
 :- use_module(fd).
-:- use_module(functional).
 :- use_module(timeout).
+:- use_module(library(http/json)).
+:- use_module(library(http/json_convert)).
+:- use_module(library(http/http_json)).
 
-:- http_handler(root(.),         httpIndex,                      []).
-:- http_handler(root(nf),        httpNFTimeout,                  []).
-:- http_handler(root(keys),      httpKeysTimeout,                []).
-:- http_handler(root(primary),   httpPrimaryAttributesTimeout,   []).
-:- http_handler(root(secondary), httpSecondaryAttributesTimeout, []).
-:- http_handler(root(fmin),      httpFMinTimeout,                []).
-:- http_handler(root(bcnfs),     httpBCNFsTimeout,               []).
-:- http_handler(root(d3nfs),     http3NFsTimeout,                []).
+:- json_object
+     analysis(
+       nf,
+       keys,
+       primaryattributes,
+       secondaryattributes,
+       fmin,
+       d3nf,
+       bcnf
+     ).
+
+:- http_handler(root(.),                   httpIndex,                      []).
+:- http_handler(root(nf),                  httpNFTimeout,                  []).
+:- http_handler(root(keys),                httpKeysTimeout,                []).
+:- http_handler(root(primaryattributes),   httpPrimaryAttributesTimeout,   []).
+:- http_handler(root(secondaryattributes), httpSecondaryAttributesTimeout, []).
+:- http_handler(root(fmin),                httpFMinTimeout,                []).
+:- http_handler(root(bcnfs),               httpBCNFsTimeout,               []).
+:- http_handler(root(d3nfs),               http3NFsTimeout,                []).
+:- http_handler(root(json),                httpJSON,                       []).
 
 httpIndex(Request)                      :- http_reply_file('index.html', [], Request).
 httpNFTimeout(Request)                  :- reply_with_timeout(Request, httpNF).
@@ -141,3 +155,19 @@ http3NFs(Request, Reply) :-
 d3nfs(R, F, Rhos) :-
   call_with_timeout(R, F, Rhos, d3nfs_all, d3nf, fd:decomposition_to_text).
 
+httpJSON(Request) :-
+  http_parameters(Request,
+    [
+      r(R, []),
+      f(F, [])
+    ]),
+  parse_fds(F, F0),
+  nf(R, F0, N),
+  keys(R, F0, Keys),
+  primaryattributes(R, F0, PrimaryAttributes),
+  secondaryattributes(R, F0, SecondaryAttributes),
+  fmins(F0, FMins),
+  bcnfs(R, F0, BCNFs),
+  d3nfs(R, F0, D3NFs),
+  prolog_to_json(analysis(N, Keys, PrimaryAttributes, SecondaryAttributes, FMins, BCNFs, D3NFs), Result),
+  reply_json(Result).
