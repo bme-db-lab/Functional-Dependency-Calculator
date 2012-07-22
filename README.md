@@ -42,7 +42,6 @@ In the SWI-Prolog console compile ```fd.pl``` (type ```[fd].```).
 
 Functional dependencies are formatted like ab->cd. Prolog atoms must begin with a small letter so you should use small letters for each attribute.
 
-
 Enumerate minimal covers of a FD set (note that the relational schema is irrelevant in this case).
 ```
 ?- fmin([cd->e, ab->cd, d->a, a->b, b->ac], FMin).
@@ -62,18 +61,15 @@ Enumerate the keys of a relational schema:
 ```
 ?- keys(abcdef, [a->b, b->c, c->a, d->e, e->f, f->d], Keys).
 Keys = [af, ae, ad, bf, be, bd, cf, ce, cd].
-
-?- keys(abcdef, [a->b, b->c, c->a, d->e, e->f, f->d], Keys).
-Keys = [af, ae, ad, bf, be, bd, cf, ce, cd].
 ```
 
 Determine the primary and secondary attributes of a relational schema:
 ```
 ?- primaryattributes(abcd, [a->b, bc->ad], Primary).
-Primary = abc.
+Primary = [a, b, c].
 
 ?- secondaryattributes(abcd, [a->b, bc->ad], Secondary).
-Secondary = d.
+Secondary = [d].
 ```
 
 Enumerate lossless and dependency preserving 3NF...
@@ -106,6 +102,9 @@ The BCNF decomposition algoritm may produce a _lot_ of possible decompositions e
 
 Starting the web service
 ------------------------
- - from SWI-Prolog: compile ```ws.pl``` then run ```start.```.
- - from command line: start the web service with the ```start.sh``` or ```start.bat``` script. Visit http://localhost:5000/ and try the examples. You may change the port by editing the ```port``` clause in ```ws.pl```.
+ - From SWI-Prolog: compile ```ws.pl``` then run ```start.```.
+ - From command line: start the web service with the ```start.sh``` or ```start.bat``` script. Visit http://localhost:5000/ and try the examples. You may change the port by editing the ```port``` clause in ```ws.pl```.
 
+Running the unit tests
+----------------------
+To run the unit tests, run ```test.sh```. Note that SWI-Prolog does not include ```plunit``` by default, see ```plunit_install.txt``` for details.
