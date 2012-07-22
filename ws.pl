@@ -83,8 +83,9 @@ httpFMin(Request, Reply) :-
         f(F, [])
       ]),
     parse_fds(F, F0),
-    fmins(F0, FMins),
-    Reply = FMins.
+    fmins(F0, FMins0),
+    atomic_list_concat(FMins0, '~n', FMins1),
+    Reply = FMins1.
 
 % list all fmins with timeout
 fmins(F, FMins) :-
@@ -134,8 +135,9 @@ httpBCNFs(Request, Reply) :-
         f(F, [])
       ]),
     parse_fds(F, F0),
-    bcnfs(R, F0, Rhos),
-    Reply = Rhos.
+    bcnfs(R, F0, Rhos0),
+    atomic_list_concat(Rhos0, '~n', Rhos1),
+    Reply = Rhos1.
 
 % list all BCNF decompositions with timeout
 bcnfs(R, F, Rhos) :-
@@ -149,9 +151,10 @@ http3NFs(Request, Reply) :-
         f(F, [])
       ]),
     parse_fds(F, F0),
-    d3nfs(R, F0, Rhos),
-    Reply = Rhos.
-
+    d3nfs(R, F0, Rhos0),
+    atomic_list_concat(Rhos0, '~n', Rhos1),
+    Reply = Rhos1.
+    
 % list all 3NF decompositions with timeout
 d3nfs(R, F, Rhos) :-
   call_with_timeout(R, F, Rhos, d3nfs_all, d3nf, fd:decomposition_to_text).

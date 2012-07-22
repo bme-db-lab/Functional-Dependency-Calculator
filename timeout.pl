@@ -37,7 +37,8 @@ call_with_timeout(A, Solution, PredNormal, PredTimeout, PredMapping) :-
       call(PredTimeout, A, Solution0),
       call(PredMapping, Solution0, Solution1),
       Solution2 = [Solution1],
-      Solution = ['[timeout, only listing the first solution]'|Solution2]
+      Solution = ['[timeout, only listing the first solution]'|Solution2],
+      !
     )
   ).
 
@@ -58,7 +59,8 @@ call_with_timeout(A, B, Solution, PredNormal, PredTimeout, PredMapping) :-
       call(PredTimeout, A, B, Solution0),
       call(PredMapping, Solution0, Solution1),
       Solution2 = [Solution1],
-      Solution = ['[timeout, only listing the first solution]'|Solution2]
+      Solution = ['[timeout, only listing the first solution]'|Solution2],
+      !
     )
   ).
 
