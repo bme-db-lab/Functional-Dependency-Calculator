@@ -12,6 +12,9 @@ autoconf
 ./configure 
 sudo make install
 
+# if `swipl -v` returns a version lower than 6 (e.g. "SWI-Prolog version 5.10.1 for amd64"), you must update SWI-Prolog
+
+# SWI-Prolog update on Debian
 # to /etc/apt/preferences
 Package: swi-prolog
 Pin: release a=experimental
@@ -39,3 +42,7 @@ Pin-Priority: 800
 
 # to /etc/apt/sources.list
 deb http://ftp.debian.org/debian experimental main
+
+# update the packages
+sudo apt-get update
+sudo apt-get upgrade
