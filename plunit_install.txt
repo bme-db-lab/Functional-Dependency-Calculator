@@ -1,0 +1,41 @@
+# install the necessary packages
+sudo apt-get install autoconf
+sudo apt-get install make
+
+# make the plunit module
+git clone git://www.swi-prolog.org/home/pl/git/pl.git
+cd pl/
+git submodule status
+git submodule update --init packages/plunit/
+cd packages/plunit/
+autoconf
+./configure 
+sudo make install
+
+# to /etc/apt/preferences
+Package: swi-prolog
+Pin: release a=experimental
+Pin-Priority: 800
+
+Package: swi-prolog-nox 
+Pin: release a=experimental
+Pin-Priority: 800
+
+Package: swi-prolog-x
+Pin: release a=experimental
+Pin-Priority: 800
+
+Package: libfontconfig1
+Pin: release n=sid
+Pin-Priority: 800
+
+Package: fontconfig-config
+Pin: release n=sid
+Pin-Priority: 800 
+
+Package: libjpeg8
+Pin: release n=sid
+Pin-Priority: 800
+
+# to /etc/apt/sources.list
+deb http://ftp.debian.org/debian experimental main
