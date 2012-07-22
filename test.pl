@@ -12,4 +12,23 @@ test(nf06) :- nf(abcdef, [a->b, b->c, c->a, d->e, e->f, f->d], nf3NF).
 test(nf07) :- nf(abc, [a->b, b->c, c->a], nfBCNF).
 test(nf08) :- nf(abcdef, [a->d, b->e, c->f, d->b, e->c, f->a], nfBCNF).
 
+% fmin
+test(fmin01) :-
+  fmins_all(
+    [a->b, ab->d, b->a, d->a],
+    [[ (a->b), (b->d), (d->a)], [ (a->b), (a->d), (b->a), (d->a)]]
+  ).
+test(fmin02) :- 
+  fmins_all(
+    [cd->e, ab->cd, d->a, a->b, b->ac],
+    [[ (a->b), (b->c), (b->d), (d->a), (d->e)],
+     [ (a->b), (a->d), (b->a), (b->c), (d->a), (d->e)],
+     [ (a->b), (a->c), (b->d), (d->a), (d->e)],
+     [ (a->b), (a->c), (a->d), (b->a), (d->a), (d->e)]]
+  ).
+test(fmin03) :- fmins_all(
+    [abcd->e, e->d, a->b, ac->d],
+    [[(a->b), (ac->e), (e->d)]] 
+  ).
+
 :- end_tests(lists).
