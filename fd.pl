@@ -66,16 +66,14 @@ primaryattributes(R, F, PrimaryAttributes) :-
   canonicalFDs(F, F0),
   cSingleRightSide(F0, F1),
   cPrimaryAttributes(R0, F1, PrimaryAttributes0),
-  sort(PrimaryAttributes0, PrimaryAttributes1),
-  atom_to_list(PrimaryAttributes, PrimaryAttributes1).
+  sort(PrimaryAttributes0, PrimaryAttributes).
 
 secondaryattributes(R, F, SecondaryAttributes) :-
   atom_to_list(R, R0),
   canonicalFDs(F, F0),
   cSingleRightSide(F0, F1),
   cSecondaryAttributes(R0, F1, SecondaryAttributes0),
-  sort(SecondaryAttributes0, SecondaryAttributes1),
-  atom_to_list(SecondaryAttributes, SecondaryAttributes1).
+  sort(SecondaryAttributes0, SecondaryAttributes).
 
 % convert a schema decomposition (set of atoms) to readable text
 decomposition_to_text(L, L0) :-
