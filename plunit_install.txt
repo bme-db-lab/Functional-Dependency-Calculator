@@ -28,18 +28,6 @@ Package: swi-prolog-x
 Pin: release a=experimental
 Pin-Priority: 800
 
-Package: libfontconfig1
-Pin: release n=sid
-Pin-Priority: 800
-
-Package: fontconfig-config
-Pin: release n=sid
-Pin-Priority: 800 
-
-Package: libjpeg8
-Pin: release n=sid
-Pin-Priority: 800
-
 # to /etc/apt/sources.list
 deb http://ftp.debian.org/debian experimental main
 
