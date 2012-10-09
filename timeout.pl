@@ -2,7 +2,7 @@
 :- use_module(functional).
 
 % predicate for timeout constant (in seconds)
-timeout(1).
+timeout(2).
 small_timeout(0.1).
 
 % ========== timeout ==========
