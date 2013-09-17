@@ -10,7 +10,7 @@
 :- op(800, xfx, ->).
 
 % the code relies heavily on backtracking, so it's worth noting
-% that the -> operator destroyes choice-points created inside the clause.
+% that the -> operator destroys choice-points created inside the clause.
 % so instead of 
 % ( Condition -> Then
 % ; Else
