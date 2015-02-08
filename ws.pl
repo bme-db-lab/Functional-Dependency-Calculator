@@ -62,9 +62,9 @@ null_to_empty([], '') :- !.
 null_to_empty(PrimaryAttributes, PrimaryAttributes).
 
 reply(Text) :-
-    format('Content-type: text/plain~n~n'),
-    format('Access-Control-Allow-Origin: *'),
-    format('Access-Control-Allow-Method: GET'),
+    format('Content-type: text/plain~n'),
+    format('Access-Control-Allow-Origin: *~n'),
+    format('Access-Control-Allow-Method: GET~n~n'),
     format(Text).
 
 % nf
