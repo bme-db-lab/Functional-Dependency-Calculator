@@ -63,6 +63,8 @@ null_to_empty(PrimaryAttributes, PrimaryAttributes).
 
 reply(Text) :-
     format('Content-type: text/plain~n~n'),
+    format('Access-Control-Allow-Origin: *'),
+    format('Access-Control-Allow-Method: GET'),
     format(Text).
 
 % nf
