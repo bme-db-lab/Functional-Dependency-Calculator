@@ -1,10 +1,12 @@
 Functional Dependency Calculator
 ================================
-Gabor Szarnyas, 2012.
+Gabor Szarnyas, Adam Lippai, 2012--2015.
 
 Little Prolog tool for performing simple algorithms on functional dependency sets.
 
-The application is available as a live web service on <https://www.db.bme.hu/fd-calculator>.
+The application (in Hungarian) is available as a live web service at <https://www.db.bme.hu/fd-calculator>.
+
+The web service (in English) is also available at <http://alippai.github.io/fdcalc-frontend/>.
 
 Given a relational scheme and a set of functional dependencies the program can
  - determinte the highest normal form of a relational schema,
