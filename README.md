@@ -4,8 +4,6 @@ Gabor Szarnyas, Adam Lippai, 2012--2015.
 
 Little Prolog tool for performing simple algorithms on functional dependency sets.
 
-The application (in Hungarian) is available as a live web service at <https://www.db.bme.hu/fd-calculator>.
-
 Given a relational scheme and a set of functional dependencies the program can
  - determinte the highest normal form of a relational schema,
  - enumerate minimal covers of the FD set,
