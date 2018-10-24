@@ -11,7 +11,7 @@ Given a relational scheme and a set of functional dependencies the program can
  - determine the primary and secondary attributes of the relational schema,
  - enumerate lossless and dependency preserving 3NF or lossless BCNF decompositions of the schema.
  
-Compatible and tested with SWI-Prolog (http://www.swi-prolog.org/). SWI-Prolog was chosen because of it's module concept, it's ability to run a HTTP server, exchange data in AJAX format and it's unit testing framework.
+Compatible and tested with [SWI-Prolog](http://www.swi-prolog.org/). This Prolog implementation was chosen because of its module concept, its ability to run a HTTP server, exchange data in AJAX format and its unit testing framework.
 
 Architecture
 ------------
@@ -39,9 +39,9 @@ Each layer uses only lower layers so the web service, the frontend and the core 
 
 Usage
 -----
-In the SWI-Prolog console compile ```fd.pl``` (type ```[fd].```).
+In the SWI-Prolog console compile `fd.pl` (type `[fd].`).
 
-Functional dependencies are formatted like ab->cd. Prolog atoms must begin with a small letter so you should use small letters for each attribute.
+Functional dependencies are formatted as `ab->cd`. Prolog atoms must begin with a small letter so you should use small letters for each attribute.
 
 Enumerate minimal covers of a FD set (note that the relational schema is irrelevant in this case).
 ```
