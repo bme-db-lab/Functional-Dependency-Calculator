@@ -1,11 +1,11 @@
 Functional Dependency Calculator
 ================================
-Gabor Szarnyas, Adam Lippai, 2012--2015.
+Gabor Szarnyas, Adam Lippai, 2012--2021.
 
 Little Prolog tool for performing simple algorithms on functional dependency sets.
 
 Given a relational scheme and a set of functional dependencies the program can
- - determinte the highest normal form of a relational schema,
+ - determine the highest normal form of a relational schema,
  - enumerate minimal covers of the FD set,
  - enumerate the keys of the relational schema,
  - determine the primary and secondary attributes of the relational schema,
@@ -53,7 +53,7 @@ FMin = [ (a->b), (a->c), (a->d), (b->a), (d->a), (d->e)] ;
 false.
 ```
 
-Determinte the highest normal form of a relational schema:
+Determine the highest normal form of a relational schema:
 ```
 ?- nf(abcdef, [a->b, b->c, c->a, d->e, e->f, f->d], NF).
 NF = nf3NF.
