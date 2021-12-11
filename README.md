@@ -11,7 +11,7 @@ Given a relational scheme and a set of functional dependencies the program can
  - determine the primary and secondary attributes of the relational schema,
  - enumerate lossless and dependency preserving 3NF or lossless BCNF decompositions of the schema.
  
-Compatible and tested with [SWI-Prolog](http://www.swi-prolog.org/). This Prolog implementation was chosen because of its module concept, its ability to run a HTTP server, exchange data in AJAX format and its unit testing framework.
+Compatible and tested with [SWI-Prolog](https://www.swi-prolog.org/). This Prolog implementation was chosen because of its module concept, its ability to run a HTTP server, exchange data in AJAX format and its unit testing framework.
 
 Architecture
 ------------
